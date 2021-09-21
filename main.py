@@ -2,23 +2,32 @@
 from classes import userClass
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
+import csv
+
+
 
 
 
 
 #create the user class
 #import user Class Object 
-
 em = input("enter email please ")
 pw = input("enter pword")
 user = userClass.User(em, pw)
 
     
 def login():
+    print('''
+    Have your auth ready
+    Have your auth ready
+    Have your auth ready
+    Have your auth ready
+    ''')
     driver = webdriver.Chrome()
     driver.get("https://app.respiratoryclinic.com.au/login")
-    # username id="inputUsername"
     userName = driver.find_element_by_id("inputUsername")
     passWord = driver.find_element_by_id("inputPassword")
     firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
@@ -30,18 +39,29 @@ def login():
     #enter google auth code part
     #select auth input 
     authInput = driver.find_element_by_xpath("//*[@id=\"two_factor_register_code\"]")
-    #authInput.send_keys("hey")
-    print(bool(authInput.get_attribute("value")))
+    authLogin = driver.find_element_by_xpath("/html/body/main/div/form/p[1]/button")
+
+    ##need to change this so I wait for user to click login. 
+    #define a function so the webdrive waits for user 
+    try:
+        WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        print("You're through")
+    except:
+        print("You did not login succesfully")
+        return 
+    
+    print("Hey your return isn't work")
+    time.sleep(10)
     
 
-
-
-
-    time.sleep(5)
     
     
-
-login()
-
+#login()
 
 
+
+##CSV STUFF
+with open('./REDRC.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=' ',quotechar='|')
+    for row in reader: 
+        print(','.join(row))
