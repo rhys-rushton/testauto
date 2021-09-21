@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import csv
+import pandas as pd
 
 
 
@@ -14,9 +14,9 @@ import csv
 
 #create the user class
 #import user Class Object 
-em = input("enter email please ")
-pw = input("enter pword")
-user = userClass.User(em, pw)
+#em = input("enter email please ")
+#pw = input("enter pword")
+#user = userClass.User(em, pw)
 
     
 def login():
@@ -44,13 +44,13 @@ def login():
     ##need to change this so I wait for user to click login. 
     #define a function so the webdrive waits for user 
     try:
-        WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        WebDriverWait(driver,timeout=30).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
         print("You're through")
     except:
         print("You did not login succesfully")
         return 
     
-    print("Hey your return isn't work")
+
     time.sleep(10)
     
 
@@ -58,10 +58,7 @@ def login():
     
 #login()
 
+df = pd.read_csv(r'./REDRC.csv')
+print(df)
 
 
-##CSV STUFF
-with open('./REDRC.csv') as csvfile:
-    reader = csv.reader(csvfile, delimiter=' ',quotechar='|')
-    for row in reader: 
-        print(','.join(row))
