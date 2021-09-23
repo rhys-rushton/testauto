@@ -55,10 +55,21 @@ def login():
     
 
     
-    
+#LOGIN FUNCTION CURRENTLY CHILLING
 #login()
 
-df = pd.read_csv(r'./REDRC.csv')
-print(df)
+
+#PANDAS READING CSV STUFF
+#<----------------------------------------->
+#READ CSV + SKIP HEADER
+df = pd.read_csv(r'./REDRC.csv', header=0)
+print(df.GIVEN_NAME)
+#SELECT RELEVANT COLOUMNS
+df_data =df[["GIVEN_NAME","FAMILY_NAME","HOME_ADDRESS_LINE_1","HOME_ADDRESS_LINE_2","HOME_SUBURB_TOWN","HOME_POSTCODE"]]
+#JUST FOR TESTING PURPOSES (ONLY USE THE FIRST FIVE)
+df_test = df_data.head()
+
+#for ind,row in df_test.iterrows():
+   # print(ind,row)
 
 

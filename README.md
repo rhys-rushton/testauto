@@ -24,3 +24,5 @@ The script then logs me in to the main page.
 The script then commences uploading the data. 
 It checks whether or not the patient is existing. If the patient exists it executes that work flow. 
 If the patient doesn't exist then it executes the other work flow. 
+
+things to match are DOB, GENDER
