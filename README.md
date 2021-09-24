@@ -26,3 +26,9 @@ It checks whether or not the patient is existing. If the patient exists it execu
 If the patient doesn't exist then it executes the other work flow. 
 
 things to match are DOB, GENDER
+
+
+
+##check whether the patient is existing or not 
+we are crrently only going to check for existing ones. 
+we will then write to file the ones who are 

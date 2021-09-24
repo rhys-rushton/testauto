@@ -1,11 +1,12 @@
 #import the user class object
-from classes import userClass
+from classes import userClass, patientClass
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import pandas as pd
+from csvOperations import csv
 
 
 
@@ -62,14 +63,37 @@ def login():
 #PANDAS READING CSV STUFF
 #<----------------------------------------->
 #READ CSV + SKIP HEADER
-df = pd.read_csv(r'./REDRC.csv', header=0)
-print(df.GIVEN_NAME)
+df = pd.read_csv(r'./csvOperations/REDRC.csv', header=0)
+#print(df.GIVEN_NAME)
 #SELECT RELEVANT COLOUMNS
-df_data =df[["GIVEN_NAME","FAMILY_NAME","HOME_ADDRESS_LINE_1","HOME_ADDRESS_LINE_2","HOME_SUBURB_TOWN","HOME_POSTCODE"]]
+df_data =df[["FILE_NUMBER","GIVEN_NAME","FAMILY_NAME","HOME_ADDRESS_LINE_1","HOME_ADDRESS_LINE_2","HOME_SUBURB_TOWN","HOME_POSTCODE"]]
 #JUST FOR TESTING PURPOSES (ONLY USE THE FIRST FIVE)
 df_test = df_data.head()
 
-#for ind,row in df_test.iterrows():
-   # print(ind,row)
+##Iterate through the csv object
+##then return values. We will save these in the
+##patient object
+
+for ind,row in df_test.iterrows():
+    #patient = ind, row[0],row[1]
+    #print(patient)
+    file = [ind, row [0]]
+    givenName = [ind, row[1]]
+    familyName = [ind, row[2]]
+    homeOne = [ind, row[3]]
+    homeTwo = [ind, row[4]]
+    suburb = [ind, row[5]]
+    postCode = [ind, row[6]]
+    patient = patientClass.Patient(file,givenName,familyName,homeOne,homeTwo,suburb,postCode)
+    print(patient.giveName)
+
+
+
+    #print(ind,row[0] + row[1])
+    #print(ind,row[1])
+    #print(ind,row[2])
+    #print(ind,row[3])
+    #print(ind,row[4])
+    #print(ind,row[5])
 
 
