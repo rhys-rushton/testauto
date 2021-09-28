@@ -32,3 +32,11 @@ things to match are DOB, GENDER
 ##check whether the patient is existing or not 
 we are crrently only going to check for existing ones. 
 we will then write to file the ones who are 
+
+#########################
+Need to vectorize the comparison function for the spreadsheets. 
+Currently huge performance issues. 
+Normal for pandas. 
+Steps: 
+    Define the comparison function sperately and then call it in the creataion of 
+    Individual columns for the usble spreadsheet. 
