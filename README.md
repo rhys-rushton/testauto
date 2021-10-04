@@ -27,6 +27,13 @@ If the patient doesn't exist then it executes the other work flow.
 
 things to match are DOB, GENDER
 
+https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas
+https://stackoverflow.com/questions/24870953/does-pandas-iterrows-have-performance-issues
+https://pandas.pydata.org/pandas-docs/stable/user_guide/basics.html#essential-basic-functionality
+https://stackoverflow.com/questions/37113173/compare-2-excel-files-using-python
+
+https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value-of-a-dataframe-is-ambiguous-use-a-empty-a-bool
+
 
 
 ##check whether the patient is existing or not 
