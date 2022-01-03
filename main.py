@@ -10,7 +10,7 @@ from csvOperations import spread
 
 ###############
 ###NEED TO CHANGE BELOw[remove 0]
-data_to_use = spread.data_done
+data_to_use = spread.data_done_date
 #print(data_to_use)
 print(data_to_use)
 

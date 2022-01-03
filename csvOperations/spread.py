@@ -2,10 +2,17 @@ import pandas as pd
 from datetime import datetime
 
 #import data, specifying the fields we need
+#from rhino we want the daily report
 fields = ['encounter_date', 'encounter_time', 'encounter_id', 'first_name', 'last_name', 'date_of_birth', 'age_at_presentation', 'gender', 'medicare_number', 'indigenous_status', 'address_line1', 'suburb', 'state', 'postcode', 'emergency_contact_name', 'country_of_birth','home_language', 'patient_symptoms', 'usual_medications', 'specimen_collected', 'diagnosis', 'outcome']
-data = pd.read_csv(r'C:\Users\RRushton\Desktop\testauto\csvOperations\data.csv', header=0, encoding = 'cp1252', usecols= fields)
+data = pd.read_csv(r'H:\testauto\csvOperations\rhinodata\rhinoapp.csv', header=0, usecols= fields)
+#data.set_index("medicare_number", inplace=True)
 data_small = data.head()
-data_done = {}
+print(data_small)
+#this is all patients in the rhino data who are in the correct date range
+data_done_date = {}
+#currently we want to only upload patients who are new patients so this dictionary contains new patients which 
+#we get by cross checking with itemcode bcse they are already registered if they are in both
+data_to_return = {}
 
 #specifying the data format
 format = "%d/%m/%Y"
@@ -21,6 +28,11 @@ try:
 except ValueError:
     res = False
     print("Please enter a correct date format")
+
+
+#now we want to read the item number data from zedmed. 
+#item_number_data = pd.read_csv(r'H:\testauto\csvOperations\dspdata\item_number.csv')
+
 
 
 ## we want to specify a date range. 
@@ -47,7 +59,7 @@ def make_dic(inputData, dateCompare):
 
     for key in transposed_data: 
         if transposed_data[key]['encounter_date'] >= dateCompare:
-            data_done[new_key_value] = transposed_data[key]
+            data_done_date[new_key_value] = transposed_data[key]
             #print(data_done[new_key_value])
             new_key_value += 1
    
@@ -55,9 +67,12 @@ def make_dic(inputData, dateCompare):
 
 
 make_dic(data, start_date)
-#print(data_done)
+#print(data_done_date)
 
 
 
 
+#refer to link below perform join on the dataframes to remove duplicates and get only patients in itemcode csv. 
+#then do another join to get those in both
 
+#https://stackoverflow.com/questions/28901683/pandas-get-rows-which-are-not-in-other-dataframe
