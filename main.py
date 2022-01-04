@@ -10,21 +10,169 @@ from csvOperations import spread
 
 ###############
 ###NEED TO CHANGE BELOw[remove 0]
-data_to_use = spread.data_done_date
+#data_to_use = spread.data_done_date
 #print(data_to_use)
-print(data_to_use)
+data_to_use = spread.dsp_and_redrc_df
+print(data_to_use[1])
 
 #patients who are new
 #eventually this will be updated and not relevant. 
-new_patients = {}
-
+new_patients = []
+pre_existing_patients = []
 
 #create the user class
 #import user Class Object 
 em = input("enter email please ")
 pw = input("enter pword")
 user = userClass.User(em, pw)
+driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
 
+def automate(): 
+    print("Have your authentication ready please")
+    #driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
+    driver.get("https://app.respiratoryclinic.com.au/login")
+    userName = driver.find_element_by_id("inputUsername")
+    passWord = driver.find_element_by_id("inputPassword")
+    firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
+    userName.clear()
+    passWord.clear()
+    userName.send_keys(user.email)
+    passWord.send_keys(user.password)
+    firstSignIn.click()
+    print("Please enter you're authentication code")
+
+    #wait for user to enter authentication code. 
+    try:
+        WebDriverWait(driver,timeout=120).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        print("You're through")
+    except:
+        print("You did not enter authentication code succesfully")
+        return 
+
+    for key in data_to_use: 
+        #just for testing purposes
+        if key > 10: 
+            break
+
+
+        given_name = data_to_use[key]['GIVEN_NAME_x']   
+        surname = data_to_use[key]['FAMILY_NAME_x']
+        DOB = data_to_use[key]['DATE_OF_BIRTH']
+        gender = data_to_use[key]['GENDER_x']
+        medicare = data_to_use[key]['MEDICARE_NUMBER']
+        adress_1 = data_to_use[key]['HOME_ADDRESS_LINE_1_x'] 
+        suburb = data_to_use[key]['HOME_SUBURB_TOWN_x']
+        postcode = data_to_use[key]['HOME_POSTCODE_x']
+        patient = patientClass.p_basic(given_name, surname, DOB, gender, medicare, adress_1,suburb, postcode)
+
+        #now iterate through the dictionary
+        #if the patient is now then register patient. 
+        #if the patient exists already then add tp patient exists_dict
+        try:
+            WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+
+            exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
+            exisiting_patient_button.click()
+
+            first_name_input = driver.find_element_by_id('firstName')
+            last_name_input = driver.find_element_by_id('lastName')
+            first_name_input.send_keys(given_name)
+            last_name_input.send_keys(surname)
+            search_button = driver.find_element_by_class_name('btn.btn-dark')
+            search_button.click()
+
+
+
+            try:
+                #check if no results pop up. 
+                new_patient_text = driver.find_element_by_xpath("//*[contains(text(), 'No results.')]").is_displayed()
+                print("new patient")
+                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+                #add to new patient key. 
+                new_patients.append(data_to_use[key])
+                print(new_patients)
+            
+            except Exception as e:
+                #print(e)
+                print("Prexisting")
+                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+                pre_existing_patients.append(data_to_use[key])
+                
+        except Exception as e:
+            print(e)
+            print("an error has occured in load this patient")
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+
+
+    #once i've done this I need to take the list of dictionaries and go through
+    #and register them. 
+    new_assesment_patient()
+      
+
+
+
+
+def new_assesment_patient():
+    
+    for el in new_patients:
+
+
+        new_assesment_patient_button = driver.find_element_by_link_text("New Assessment Patient")
+        new_assesment_patient_button.click()
+
+
+
+
+
+
+    
+
+
+
+automate()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 def navigate_res_app ():
     driver = webdriver.Chrome()
     #driver.get("https://app.respiratoryclinic.com.au/login")
@@ -100,12 +248,12 @@ def navigate_res_app ():
 
     
 def automate(patient_dict, patient_class):
-    print('''
+    print(\'''
     Have your auth ready
     Have your auth ready
     Have your auth ready
     Have your auth ready
-    ''')
+    \''')
     driver = webdriver.Chrome()
     driver.get("https://app.respiratoryclinic.com.au/login")
     userName = driver.find_element_by_id("inputUsername")
@@ -227,9 +375,9 @@ def automate(patient_dict, patient_class):
     
 
     
-automate(data_to_use, patientClass)
+automate(data_to_use,  ss)
 
-
+'''
 
 
 
