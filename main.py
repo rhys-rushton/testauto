@@ -106,8 +106,8 @@ def automate():
 
     #once i've done this I need to take the list of dictionaries and go through
     #and register them. 
-    for el in range(len(new_patients)): 
-        print(new_patients[el]['GIVEN_NAME_x'])
+    #for el in range(len(new_patients)): 
+        #print(new_patients[el]['GIVEN_NAME_x'])
     new_assesment_patient()
       
 
@@ -115,9 +115,10 @@ def automate():
 
 
 def new_assesment_patient():
-    
-    for el in new_patients:
+
+    for el in range(len(new_patients)):
         try:
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
             given_name = new_patients[el]['GIVEN_NAME_x'] 
             surname = new_patients[el]['FAMILY_NAME_x']
             date_of_birth = new_patients[el]['DATE_OF_BIRTH']
@@ -129,6 +130,7 @@ def new_assesment_patient():
             patient = patientClass.p_basic(given_name, surname, date_of_birth, gender, medicare, address1,suburb, postcode)
         except Exception as e: 
             print(e)
+            
         
         try:
             new_assesment_patient_button = driver.find_element_by_link_text("New Assessment Patient")
@@ -160,6 +162,7 @@ def new_assesment_patient():
 
         except Exception as e: 
             print(e)
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
 
 
