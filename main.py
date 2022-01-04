@@ -106,6 +106,8 @@ def automate():
 
     #once i've done this I need to take the list of dictionaries and go through
     #and register them. 
+    for el in range(len(new_patients)): 
+        print(new_patients[el]['GIVEN_NAME_x'])
     new_assesment_patient()
       
 
@@ -115,10 +117,51 @@ def automate():
 def new_assesment_patient():
     
     for el in new_patients:
+        try:
+            given_name = new_patients[el]['GIVEN_NAME_x'] 
+            surname = new_patients[el]['FAMILY_NAME_x']
+            date_of_birth = new_patients[el]['DATE_OF_BIRTH']
+            gender = new_patients[el]['GENDER_x']
+            medicare = new_patients[el]['MEDICARE_NUMBER']
+            address1 = new_patients[el]['HOME_ADDRESS_LINE_1_x'] 
+            suburb = new_patients[el]['HOME_SUBURB_TOWN_x']
+            postcode = new_patients[el]['HOME_POSTCODE_x']
+            patient = patientClass.p_basic(given_name, surname, date_of_birth, gender, medicare, address1,suburb, postcode)
+        except Exception as e: 
+            print(e)
+        
+        try:
+            new_assesment_patient_button = driver.find_element_by_link_text("New Assessment Patient")
+            new_assesment_patient_button.click()
+        except Exception as e: 
+            print(e)
+
+        #get web stuff and upload it 
+        try:
+            name_field = driver.find_element_by_id('patient_firstName')
+            name_field.send_keys(patient.name)
 
 
-        new_assesment_patient_button = driver.find_element_by_link_text("New Assessment Patient")
-        new_assesment_patient_button.click()
+            #surname_field = 
+            #referral_field = 
+            #dob_field = 
+            #gender_field = 
+            #atsi_field = 
+            #medicare_field = 
+            #adress_1_field = 
+            #suburb_field
+            #state_field 
+            #postcode_field 
+            #emergency_field 
+            #country_birth_field = 
+            #at_home_language_field = 
+            #symptoms_field = 
+
+
+        except Exception as e: 
+            print(e)
+
+
 
 
 
