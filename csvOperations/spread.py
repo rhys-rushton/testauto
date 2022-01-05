@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+import csv
 
 #merge dsp and redrc to get medicare. 
 #then straight to web. 
@@ -14,7 +15,13 @@ dsp_data = pd.read_csv(r'H:\testauto\csvOperations\dsp\DSPatients.csv', header=0
 #aim here is to get medicare number so we can compare this to rhino
 dsp_and_redrc_df = pd.merge(item_number_data, dsp_data, on= 'FILE_NUMBER', how = 'inner')
 #change format so that we don't have decimals for medicare
+dsp_and_redrc_df.fillna('', inplace=True)
 pd.set_option('display.float_format', lambda x: '%.0f' % x)
+dsp_and_redrc_df.MEDICARE_NUMBER = dsp_and_redrc_df.MEDICARE_NUMBER.astype(str)
+dsp_and_redrc_df.HOME_POSTCODE_x = dsp_and_redrc_df.HOME_POSTCODE_x.astype(str)
+
+error_list = []
+
 
 #get rid of irrelevant columns
 dsp_and_redrc_df.drop(['CLINIC_CODE_x', 'TITLE_x','MAILING_ADDRESS_LINE_1_x',
@@ -34,10 +41,40 @@ dsp_and_redrc_df.drop(['CLINIC_CODE_x', 'TITLE_x','MAILING_ADDRESS_LINE_1_x',
        'VETERAN_FILE_NUMBER_EXPIRY_DATE', 'PATIENT_HEALTH_CARE_CARD',
        'PATIENT_HLTH_CARE_CARD_EX_DATE', 'SAFETY_NET_NO'  ], axis = 1, inplace=True)
 
-#the dsp_and_redrc_df contains all patients whether they are new or not
-print(dsp_and_redrc_df)
-#change to a dictionary. 
 dsp_and_redrc_df = (dsp_and_redrc_df.transpose()).to_dict()
+
+
+#for col in dsp_and_redrc_df.columns:
+    #print(col)
+
+#data_frame_data_errors = dsp_and_redrc_df.loc[(dsp_and_redrc_df['FAMILY_NAME_x'] == 'NO LAST NAME') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'Onlyname') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'No Last Name') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'No Surname')]
+#print(data_frame_data_errors)
+
+#dsp_and_redrc_df = dsp_and_redrc_df[(dsp_and_redrc_df['FAMILY_NAME_x'] != 'NO LAST NAME') | (dsp_and_redrc_df['FAMILY_NAME_x'] != 'Onlyname') | (dsp_and_redrc_df['FAMILY_NAME_x'] != 'No Last Name') | (dsp_and_redrc_df['FAMILY_NAME_x'] != 'No Surname')]
+
+#bad_values = dsp_and_redrc_df[(dsp_and_redrc_df['FAMILY_NAME_x'] == 'NO LAST NAME') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'Onlyname') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'No Last Name') | (dsp_and_redrc_df['FAMILY_NAME_x'] == 'No Surname')].index
+#dsp_and_redrc_df.drop(bad_values, inplace=True)
+
+#the dsp_and_redrc_df contains all patients whether they are new or not
+#print(dsp_and_redrc_df)
+#change to a dictionary. 
+
+#data_frame_data_errors = (data_frame_data_errors.transpose()).to_dict()
+
+#for things in data_frame_data_errors:
+    #error_list.append(data_frame_data_errors[things])
+
+
+#print(error_list)
+
+#fields = ['FILE_NUMBER', 'HOME_ADDRESS_LINE_2_x', 'HOME_PHONE_x', 'MEDICARE_NUMBER', 'MAILING_ADDRESS_LINE_2_y', 'GENDER_x', 'email_ADDRESS', 'HOME_ADDRESS_LINE_1_x', 'MAILING_ADDRESS_LINE_1_y', 'DATE_OF_BIRTH', 'FAMILY_NAME_x', 'PATIENT_ID', 'HOME_SUBURB_TOWN_x', 'MEDICARE_NUMBER_EXPIRY', 'GIVEN_NAME_x', 'MEDICARE_BASE_NUMBER', 'LAST_IN_x', 'HOME_POSTCODE_x', 'AGE_x']
+
+#with open(r'H:\testauto\csv\surname_error.csv', 'w', newline='') as f:
+    #writer = csv.DictWriter(f, fieldnames=fields)
+    #writer.writeheader()
+    #writer.writerows(error_list)
+
+
 
 
 

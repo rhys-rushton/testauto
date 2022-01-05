@@ -36,4 +36,4 @@ https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value
 
 
 
-write new patients to a  csv file. 
+This is the automation script for registering new patients. 

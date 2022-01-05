@@ -4,9 +4,11 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 import time as times
 import pandas as pd
 from csvOperations import spread
+import csv
 
 ###############
 ###NEED TO CHANGE BELOw[remove 0]
@@ -19,6 +21,9 @@ print(data_to_use[1])
 #eventually this will be updated and not relevant. 
 new_patients = []
 pre_existing_patients = []
+
+patient_new_error = []
+patient_new_success = []
 
 #create the user class
 #import user Class Object 
@@ -51,8 +56,8 @@ def automate():
 
     for key in data_to_use: 
         #just for testing purposes
-        if key > 10: 
-            break
+        #if key > 10: 
+            #break
 
 
         given_name = data_to_use[key]['GIVEN_NAME_x']   
@@ -64,6 +69,11 @@ def automate():
         suburb = data_to_use[key]['HOME_SUBURB_TOWN_x']
         postcode = data_to_use[key]['HOME_POSTCODE_x']
         patient = patientClass.p_basic(given_name, surname, DOB, gender, medicare, adress_1,suburb, postcode)
+
+        
+
+
+
 
         #now iterate through the dictionary
         #if the patient is now then register patient. 
@@ -90,7 +100,7 @@ def automate():
                 driver.get("https://app.respiratoryclinic.com.au/dashboard/")
                 #add to new patient key. 
                 new_patients.append(data_to_use[key])
-                print(new_patients)
+                #print(new_patients)
             
             except Exception as e:
                 #print(e)
@@ -108,13 +118,21 @@ def automate():
     #and register them. 
     #for el in range(len(new_patients)): 
         #print(new_patients[el]['GIVEN_NAME_x'])
-    new_assesment_patient()
+
+    fields = ['FILE_NUMBER', 'HOME_ADDRESS_LINE_2_x', 'HOME_PHONE_x', 'MEDICARE_NUMBER', 'MAILING_ADDRESS_LINE_2_y', 'GENDER_x', 'email_ADDRESS', 'HOME_ADDRESS_LINE_1_x', 'MAILING_ADDRESS_LINE_1_y', 'DATE_OF_BIRTH', 'FAMILY_NAME_x', 'PATIENT_ID', 'HOME_SUBURB_TOWN_x', 'MEDICARE_NUMBER_EXPIRY', 'GIVEN_NAME_x', 'MEDICARE_BASE_NUMBER', 'LAST_IN_x', 'HOME_POSTCODE_x', 'AGE_x']
+
+    with open(r'H:\testauto\csv\existing.csv', 'w', newline='') as f: 
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(pre_existing_patients)
+
+    new_assesment_patient(fields)
       
 
 
 
-
-def new_assesment_patient():
+#this function is where we fill in all the information
+def new_assesment_patient(fields):
 
     for el in range(len(new_patients)):
         try:
@@ -129,6 +147,7 @@ def new_assesment_patient():
             postcode = new_patients[el]['HOME_POSTCODE_x']
             patient = patientClass.p_basic(given_name, surname, date_of_birth, gender, medicare, address1,suburb, postcode)
         except Exception as e: 
+            print("Error in creating patient obj")
             print(e)
             
         
@@ -143,40 +162,123 @@ def new_assesment_patient():
             name_field = driver.find_element_by_id('patient_firstName')
             name_field.send_keys(patient.name)
 
+            surname_field = driver.find_element_by_id('patient_lastName')  
+            surname_field.send_keys(patient.surname)
 
-            #surname_field = 
-            #referral_field = 
-            #dob_field = 
-            #gender_field = 
-            #atsi_field = 
-            #medicare_field = 
-            #adress_1_field = 
-            #suburb_field
-            #state_field 
-            #postcode_field 
-            #emergency_field 
-            #country_birth_field = 
-            #at_home_language_field = 
-            #symptoms_field = 
+            referral_field = Select(driver.find_element_by_id('patient_referralSource_choice'))
+            referral_field.select_by_visible_text('General Practice website')
+
+            dob_field = driver.find_element_by_id('patient_dateOfBirth')
+            dob_field.send_keys(patient.DOB)
+
+            gender_field = Select(driver.find_element_by_id('patient_gender'))
+            
+            if new_patients[el]['GENDER_x'] == '':
+                 gender_field.select_by_visible_text('Not Stated')
+            elif new_patients[el]['GENDER_x'] == 'M':
+                gender_field.select_by_visible_text('Male')
+            elif new_patients[el]['GENDER_x'] == 'F':
+                gender_field.select_by_visible_text('Female')
+
+            atsi_field = Select(driver.find_element_by_id('patient_indigenousStatus'))
+            atsi_field.select_by_visible_text('Not stated')
+
+            #enter medicare number
+            medicare_field = Select(driver.find_element_by_id('patient_typeOfIdProvided'))
+            if new_patients[el]['MEDICARE_NUMBER'] == '':
+                medicare_field.select_by_visible_text('No - Other ID sighted')
+            elif new_patients[el]['MEDICARE_NUMBER'] != '': 
+                medicare_field.select_by_visible_text('Yes - Please enter Medicare Card number')
+                patient_medicare_num = driver.find_element_by_id('patient_medicareNumber')
+                patient_medicare_ref = driver.find_element_by_id('patient_medicareReferenceNumber')
+                patient_medicare_num.send_keys(patient.medicare[0:10])
+                patient_medicare_ref.send_keys(patient.medicare[10])
+            
+            adress_line_1 = driver.find_element_by_id('patient_addressLine1')
+            adress_line_1.send_keys(patient.address)
+
+            suburb_field = driver.find_element_by_id('patient_suburb')
+            suburb_field.send_keys(patient.suburb)
+
+            postcode_field = driver.find_element_by_id('patient_postcode')
+            postcode_field.send_keys(patient.post_code)
+
+            state_field = Select(driver.find_element_by_id('patient_state'))
+            if(patient.post_code[0]) == '2': 
+                state_field.select_by_visible_text('NSW')
+
+            elif(patient.post_code[0]) == '3':
+                state_field.select_by_visible_text('VIC')
+
+            elif(patient.post_code[0]) == '4':
+                state_field.select_by_visible_text('QLD')
+
+            elif(patient.post_code[0]) == '5':
+                state_field.select_by_visible_text('SA')
+
+            elif(patient.post_code[0]) == '6':
+                state_field.select_by_visible_text('WA')
+
+            elif(patient.post_code[0]) == '7':
+                state_field.select_by_visible_text('TAS')
+
+            elif(patient.post_code[0]) == '0':
+                state_field.select_by_visible_text('NT')
+            
 
 
-        except Exception as e: 
-            print(e)
+            emergency_field = driver.find_element_by_id('patient_emergencyContactName')
+            emergency_field.send_keys('Nil Provided')
+
+
+            country_of_birth = Select(driver.find_element_by_id('patient_countryOfBirth_choice'))
+            country_of_birth.select_by_visible_text('Not stated')
+
+            home_language = Select(driver.find_element_by_id('patient_homeLanguage_choice'))
+            home_language.select_by_visible_text('Not stated')
+
+            patient_symptoms_other = driver.find_element_by_id('patient_symptoms_choice__other')
+            patient_symptoms_other.click()
+
+            driver.find_element_by_id('patient_symptoms_other').send_keys('See encounter')
+
+            driver.find_element_by_id('patient_reportConsent_yes').click()
+
+            patient_new_success.append(new_patients[el])
+
+            
+
+            save_button = driver.find_element_by_class_name('btn.btn-dark')
+            save_button.click()
+            
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
+            #times.sleep(1)
 
+        except Exception as e: 
+            print("Error in loading patient data")
+            times.sleep(1)
+            print(e)
+            patient_new_error.append(new_patients[el])
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
+        #write to the csvs
+        with open(r'H:\testauto\csv\new_succes.csv', 'w', newline='') as f: 
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(patient_new_success)
 
-
-
-
-
-    
+        with open(r'H:\testauto\csv\new_error.csv', 'w', newline='') as f: 
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(patient_new_error)
+          
 
 
 
 automate()
 
+print("All finished")
 
 
 
