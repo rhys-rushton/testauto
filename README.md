@@ -37,3 +37,10 @@ https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value
 
 
 This is the automation script for registering new patients. 
+
+# Things to automate
+3000-> new registration
+2000-> encounters
+3000 -> follow up. 
+2000 -> booster 
+500 -> check for medicare against rhino data and put those that are not in rhino into respiratory clinic app. put those that are in rhino app into prexisting. 
