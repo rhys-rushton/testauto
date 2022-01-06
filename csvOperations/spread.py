@@ -53,6 +53,7 @@ fields_for_rhino = ['encounter_date', 'encounter_time', 'encounter_id', 'first_n
 rhino_data = pd.read_csv(r'H:\testauto\csvOperations\rhinodata\rhinoapp.csv',dtype={'medicare_number': 'str'}, header=0, usecols= fields_for_rhino)
 rhino_data['medicare_number'] = rhino_data['medicare_number'].astype(str)
 rhino_data.fillna('', inplace=True)
+
 #using a copy below just so nothing gets stuffed up. 
 #below we are cleaning data
 #first step is comparing the two data frames, we need to convert all the data so that it is a string in similar formats. 
@@ -72,10 +73,10 @@ dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBE
 
 
 #get all the new patients
-new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = 'MEDICARE_NUMBER', right_on='medicare_number', indicator=True)
+new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'], indicator=True)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
-prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = 'MEDICARE_NUMBER', right_on='medicare_number')
-print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
+prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
+#print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
 
 
 #remove duplicates as we are matching based on medicare so we can drop based on file number
@@ -91,6 +92,7 @@ no_medicare_df = new_patients[new_patients['MEDICARE_NUMBER'] == '']
 
 # get all patients without medicare numbers removed from new_patient data. 
 new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
+
 #print(no_medicare_df)
 #print(prexisting_df)
 #print(new_patients)
@@ -98,5 +100,3 @@ new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
 #write the patients with no medicare to csv file. 
 no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
 
-#print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
-#print(rhino_data['encounter_id'])
