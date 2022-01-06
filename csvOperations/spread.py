@@ -40,6 +40,7 @@ dsp_and_redrc_df.drop(['CLINIC_CODE_x', 'TITLE_x','MAILING_ADDRESS_LINE_1_x',
        'VETERAN_FILE_NUMBER_EXPIRY_DATE', 'PATIENT_HEALTH_CARE_CARD',
        'PATIENT_HLTH_CARE_CARD_EX_DATE', 'SAFETY_NET_NO'  ], axis = 1, inplace=True)
 
+#we want to remove this eventually but currently it is being used in the web scraping part. 
 dsp_and_redrc_df = (dsp_and_redrc_df.transpose()).to_dict()
 
 
@@ -51,6 +52,7 @@ dsp_and_redrc_df = (dsp_and_redrc_df.transpose()).to_dict()
 fields_for_rhino = ['encounter_date', 'encounter_time', 'encounter_id', 'first_name', 'last_name', 'date_of_birth', 'age_at_presentation', 'gender', 'medicare_number', 'indigenous_status', 'address_line1', 'suburb', 'state', 'postcode', 'emergency_contact_name', 'country_of_birth','home_language', 'patient_symptoms', 'usual_medications', 'specimen_collected', 'diagnosis', 'outcome']
 rhino_data = pd.read_csv(r'H:\testauto\csvOperations\rhinodata\rhinoapp.csv',dtype={'medicare_number': 'str'}, header=0, usecols= fields_for_rhino)
 rhino_data['medicare_number'] = rhino_data['medicare_number'].astype(str)
+rhino_data.fillna('', inplace=True)
 #using a copy below just so nothing gets stuffed up. 
 #below we are cleaning data
 #first step is comparing the two data frames, we need to convert all the data so that it is a string in similar formats. 
@@ -68,19 +70,33 @@ dsp_and_redrc_df_copy['MEDIRCARE_NUMBER_WREF'] = dsp_and_redrc_df_copy['MEDICARE
 dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBER'].str.slice(start=0, stop=10)
 
 
+
 #get all the new patients
 new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = 'MEDICARE_NUMBER', right_on='medicare_number', indicator=True)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = 'MEDICARE_NUMBER', right_on='medicare_number')
+print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
+
 
 #remove duplicates as we are matching based on medicare so we can drop based on file number
-prexisting_df.drop_duplicates(subset=['FILE_NUMBER'], inplace=True)
+#we want to get the most recent version though so that we can update the encounter. 
+prexisting_df.drop_duplicates(subset=['FILE_NUMBER'],keep='last', inplace=True)
 
 #all the patients we couldn't find are in 'new_patients'
 #all the patients that were already in the rhino app go into 'prexistng_df'. 
-print(new_patients)
-print(prexisting_df)
+#all the patients in no medicare df are ones who have no medicare number but may not be new.
 
-#below is method for turning data to dict. 
-#inputData.transpose()).to_dict()
-    
+# get all patients without medicare 
+no_medicare_df = new_patients[new_patients['MEDICARE_NUMBER'] == '']
+
+# get all patients without medicare numbers removed from new_patient data. 
+new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
+#print(no_medicare_df)
+#print(prexisting_df)
+#print(new_patients)
+
+#write the patients with no medicare to csv file. 
+no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
+
+#print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
+#print(rhino_data['encounter_id'])

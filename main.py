@@ -282,6 +282,8 @@ print("All finished")
 
 
 
+#when adding a new patient what you want to do is after you register them click add encounter which is what should pop up after they've been registered. 
+
 
 
 
