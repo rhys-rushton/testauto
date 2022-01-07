@@ -1,6 +1,4 @@
 import pandas as pd
-from datetime import datetime
-import csv
 
 #we do the following here:
 #read the item_number_data from 'REDRC.csv'
@@ -73,6 +71,9 @@ dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBE
 
 
 #get all the new patients
+#we merge on multiple column values because if we merge solely based on medicare_number we end up overwriting other column values.
+#this is becuase we strip out the identification number from the dsp_and_and_redrc_copy dataframe. 
+#if we don't merge with an individualising parameter (i.e. DOB) then what happens is that it will overwrite column values for anyone who shares a medicare card (i.e. families)
 new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'], indicator=True)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
@@ -93,10 +94,16 @@ no_medicare_df = new_patients[new_patients['MEDICARE_NUMBER'] == '']
 # get all patients without medicare numbers removed from new_patient data. 
 new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
 
-#print(no_medicare_df)
-#print(prexisting_df)
-#print(new_patients)
+#print(no_medicare_df.shape[0])
+#print(prexisting_df.shape[0])
+#print(new_patients.shape[0])
+
 
 #write the patients with no medicare to csv file. 
 no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
+#print(prexisting_df['LAST_IN_x'][0:10])
 
+
+new_patients = (new_patients.transpose()).to_dict()
+#print(new_patients[0]['LAST_IN_x'][0:10])
+existing_patients = (prexisting_df.transpose()).to_dict()

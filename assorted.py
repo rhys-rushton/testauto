@@ -6,7 +6,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 import time as times
-import pandas as pd
 from csvOperations import spread
 import csv
 
@@ -21,12 +20,10 @@ print(data_to_use[1])
 #eventually this will be updated and not relevant. 
 new_patients = []
 pre_existing_patients = []
-
 patient_new_error = []
 patient_new_success = []
 
 #create the user class
-#import user Class Object 
 em = input("enter email please ")
 pw = input("enter pword")
 user = userClass.User(em, pw)
