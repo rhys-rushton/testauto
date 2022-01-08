@@ -10,6 +10,13 @@ from csvOperations import spread
 import csv
 from random import randrange
 
+fields = ['FILE_NUMBER', 'FAMILY_NAME_x','GIVEN_NAME_x','HOME_ADDRESS_LINE_1_x',
+            'HOME_ADDRESS_LINE_2_x','HOME_SUBURB_TOWN_x ','HOME_POSTCODE_x ',
+            'HOME_PHONE_x','AGE_x', 'GENDER_x','LAST_IN_x', 'DATE_OF_BIRTH',
+            'PATIENT_ID', 'MEDIRCARE_NUMBER_WREF', 'encounter_date', 'encounter_time',
+            'encounter_id','first_name', 'last_name', 'date_of_birth', 'age_at_presentation',
+            'gender', 'success_code', 'error_code']
+
 #get the existing patients. 
 data_to_use = spread.existing_patients
 
@@ -127,7 +134,7 @@ def automate():
 
             times.sleep(20)
             save_button = driver.find_element_by_css_selector('btn.btn-dark')
-            save_button.click()
+            #save_button.click()
 
             try:
                 WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
@@ -148,4 +155,14 @@ def automate():
 
 automate()
 
-#Gnomescript
+#write errors to csv
+with open(r'H:\testauto\csv\existing_patients_output\existing_encounter_err.csv', 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(encounter_error)
+
+#write successes to csv
+with open(r'H:\testauto\csv\existing_patients_output\encounter_success.csv', 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(encounter_success)

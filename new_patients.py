@@ -175,42 +175,48 @@ def new_patient_registration():
             times.sleep(2)
             save_button = driver.find_element_by_class_name('btn.btn-dark')
             save_button.click()
-            
-            try: 
-                driver.find_element_by_class_name('alert.alert-warning')
-                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
-                #times.sleep(5)
-            except:
-                print("You are adding encounter from new_patient func")
-                times.sleep(5)
-                #new_patient_add_encounter(new_patient_data, key)
-                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
-            
+            #click the save button for potential duplicates, as they are registered
+            #for vax. 
+            try: 
+                potential_dup = driver.find_element_by_class_name('alert.alert-warning')
+                
+                save_button.click()
+                new_patients_succesfully_entered.append(new_patient_data[key])  
+                times.sleep(1)
+                #new_patient_add_encounter(new_patient_data, key)
+              
+
+            except:
+                if new_assesment_patient_button.is_displayed():
+                    new_patients_succesfully_entered.append(new_patient_data[key])
+                    #new_patient_add_encounter(new_patient_data, key)
+                   
+                else:
+                    new_patients_w_error.append(new_patient_data[key])
+                    times.sleep(1)
 
             #add the encounter for the patient
             #new_patient_add_encounter(new_patient_data, key)
-            #driver.get("https://app.respiratoryclinic.com.au/dashboard/")
-
-
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
         except:
             print("Hey this is error in new patient upload ")
             new_patients_w_error.append(new_patient_data[key])
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
+#write to the csvs
+with open(r'H:\testauto\csv\new_patient_rego_opt\new_succes.csv', 'w', newline='') as f: 
+    writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(new_patients_succesfully_entered)
+
+with open(r'H:\testauto\csv\new_patient_rego_opt\new_error.csv', 'w', newline='') as f: 
+    writer = csv.DictWriter(f, fieldnames=fields,extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(new_patients_w_error)
 
 
-     #write to the csvs
-    with open(r'H:\testauto\csv\new_succes.csv', 'w', newline='') as f: 
-        writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(new_patients_succesfully_entered)
-
-    with open(r'H:\testauto\csv\new_error.csv', 'w', newline='') as f: 
-        writer = csv.DictWriter(f, fieldnames=fields,extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(new_patients_w_error)
 
 
 #new patient add encounter

@@ -55,8 +55,6 @@ def automate():
         #just for testing purposes
         #if key > 10: 
             #break
-
-
         given_name = data_to_use[key]['GIVEN_NAME_x']   
         surname = data_to_use[key]['FAMILY_NAME_x']
         DOB = data_to_use[key]['DATE_OF_BIRTH']
@@ -67,20 +65,13 @@ def automate():
         postcode = data_to_use[key]['HOME_POSTCODE_x']
         patient = patientClass.p_basic(given_name, surname, DOB, gender, medicare, adress_1,suburb, postcode)
 
-        
-
-
-
-
         #now iterate through the dictionary
         #if the patient is now then register patient. 
         #if the patient exists already then add tp patient exists_dict
         try:
             WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-
             exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
             exisiting_patient_button.click()
-
             first_name_input = driver.find_element_by_id('firstName')
             last_name_input = driver.find_element_by_id('lastName')
             first_name_input.send_keys(given_name)
@@ -88,11 +79,11 @@ def automate():
             search_button = driver.find_element_by_class_name('btn.btn-dark')
             search_button.click()
 
-
-
             try:
                 #check if no results pop up. 
-                new_patient_text = driver.find_element_by_xpath("//*[contains(text(), 'No results.')]").is_displayed()
+                #new_patient_text = driver.find_element_by_xpath("//*[contains(text(), 'No results.')]").is_displayed()
+                patient_dob = driver.find_element_by_xpath(f"//*[contains(text(), '{DOB}')]").is_displayed()
+                patient_name = driver.find_element_by_xpath(f"//*[contains(text(), '{DOB + ' ' + given_name}')]").is_displayed()
                 print("new patient")
                 driver.get("https://app.respiratoryclinic.com.au/dashboard/")
                 #add to new patient key. 
@@ -110,15 +101,11 @@ def automate():
             print("an error has occured in load this patient")
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
-
     #once i've done this I need to take the list of dictionaries and go through
     #and register them. 
-    #for el in range(len(new_patients)): 
-        #print(new_patients[el]['GIVEN_NAME_x'])
-
     fields = ['FILE_NUMBER', 'HOME_ADDRESS_LINE_2_x', 'HOME_PHONE_x', 'MEDICARE_NUMBER', 'MAILING_ADDRESS_LINE_2_y', 'GENDER_x', 'email_ADDRESS', 'HOME_ADDRESS_LINE_1_x', 'MAILING_ADDRESS_LINE_1_y', 'DATE_OF_BIRTH', 'FAMILY_NAME_x', 'PATIENT_ID', 'HOME_SUBURB_TOWN_x', 'MEDICARE_NUMBER_EXPIRY', 'GIVEN_NAME_x', 'MEDICARE_BASE_NUMBER', 'LAST_IN_x', 'HOME_POSTCODE_x', 'AGE_x']
 
-    with open(r'H:\testauto\csv\existing.csv', 'w', newline='') as f: 
+    with open(r'H:\testauto\csv\pre_existing_patients.csv','w', newline='') as f: 
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(pre_existing_patients)
@@ -241,13 +228,38 @@ def new_assesment_patient(fields):
 
             driver.find_element_by_id('patient_reportConsent_yes').click()
 
-            patient_new_success.append(new_patients[el])
+            
 
             
 
             save_button = driver.find_element_by_class_name('btn.btn-dark')
             save_button.click()
-            
+
+            #click the save button for potential duplicates, as they are registered
+            #for vax. 
+            try: 
+                potential_dup = driver.find_element_by_class_name('alert.alert-warning')
+                
+                save_button.click()
+                patient_new_success.append(new_patients[el])  
+                times.sleep(1)
+                #new_patient_add_encounter(new_patient_data, key)
+              
+
+            except:
+                if new_assesment_patient_button.is_displayed():
+                    patient_new_success.append(new_patients[el])
+                    #new_patient_add_encounter(new_patient_data, key)
+                   
+                else:
+                    patient_new_error.append(new_patients[el])
+                    times.sleep(1)
+
+            #add the encounter for the patient
+            #new_patient_add_encounter(new_patient_data, key)
+
+
+            #patient_new_success.append(new_patients[el])
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
             #times.sleep(1)
@@ -259,16 +271,16 @@ def new_assesment_patient(fields):
             patient_new_error.append(new_patients[el])
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
-        #write to the csvs
-        with open(r'H:\testauto\csv\new_succes.csv', 'w', newline='') as f: 
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(patient_new_success)
+    #write to the csvs
+    with open(r'H:\testauto\csv\new_patient_rego_opt\new_succes.csv', 'w', newline='') as f: 
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(patient_new_success)
 
-        with open(r'H:\testauto\csv\new_error.csv', 'w', newline='') as f: 
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(patient_new_error)
+    with open(r'H:\testauto\csv\new_patient_rego_opt\new_error.csv', 'w', newline='') as f: 
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(patient_new_error)
           
 
 
@@ -312,219 +324,6 @@ print("All finished")
 
 
 
-
-
-
-
-
-
-
-'''
-def navigate_res_app ():
-    driver = webdriver.Chrome()
-    #driver.get("https://app.respiratoryclinic.com.au/login")
-    #userName = driver.find_element_by_id("inputUsername")
-    #passWord = driver.find_element_by_id("inputPassword")
-    #firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
-    #userName.clear()
-    #passWord.clear()
-    #userName.send_keys(user.email)
-    ##passWord.send_keys(user.password)
-    #firstSignIn.click()
-    #######################################
-    try: 
-        WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-
-        exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
-        exisiting_patient_button.click()
-
-        times.sleep(5)
-        encounter_id_input = driver.find_element_by_xpath('//*[@id="encounterId"]')
-        
-        encounter_id_input.send_keys("2417940")
-        search_button = driver.find_element_by_class_name('btn.btn-dark')
-        search_button.click()
-        times.sleep(5)
-
-        try:
-
-            new_encounter_button = driver.find_element_by_link_text("New Encounter")
-            new_encounter_button.click()
-            #checkbox
-            no_symptoms_button = driver.find_element_by_xpath('//*[@id="encounter_symptoms_choice"]/div[20]/label')
-            #tickbox
-            usual_medications = driver.find_element_by_xpath('//*[@id="encounter_usualMedications"]')
-            #speciman dropdon
-            speciman = driver.find_element_by_xpath('//*[@id="encounter_specimenCollected"]')
-            #diagnosis dropdown
-            diagnosis = driver.find_element_by_xpath('//*[@id="encounter_diagnosis_choice"]')
-            #outocme  dropdown
-            outcome = driver.find_element_by_xpath('//*[@id="encounter_outcome_choice"]')
-
-            #certificate dropdown 
-            certificate = driver.find_element_by_xpath('//*[@id="encounter_outcome_choice"]')
-
-            #sumbmit 
-            submit = driver.find_element_by_xpath('//input[@type="submit"]')
-            print("Patient found")
-            
-        
-        except: 
-            ##write this patient and their details to file. 
-            print("THis is a new patient.")
-
-
-
-
-
-     
-
-
-    except:
-        #exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
-        #exisiting_patient_button.click()
-        times.sleep(10)
-        print("Couldn't Click Existing Assement Patients Button or Error with Encounter ID")
-
-
-#navigate_res_app()
-
-
-
-
-
-    
-def automate(patient_dict, patient_class):
-    print(\'''
-    Have your auth ready
-    Have your auth ready
-    Have your auth ready
-    Have your auth ready
-    \''')
-    driver = webdriver.Chrome()
-    driver.get("https://app.respiratoryclinic.com.au/login")
-    userName = driver.find_element_by_id("inputUsername")
-    passWord = driver.find_element_by_id("inputPassword")
-    firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
-    userName.clear()
-    passWord.clear()
-    userName.send_keys(user.email)
-    passWord.send_keys(user.password)
-    firstSignIn.click()
-    #enter google auth code part
-    #select auth input 
-    authInput = driver.find_element_by_xpath("//*[@id=\"two_factor_register_code\"]")
-    authLogin = driver.find_element_by_xpath("/html/body/main/div/form/p[1]/button")
-    #new patients counter
-    #counts number of new patients use this value to index the new ditionary
-    #when using in function call this as index after updating value
-    new_patients_counter = 0
-
-
-
-    ##need to change this so I wait for user to click login. 
-    #define a function so the webdrive waits for user 
-    try:
-        WebDriverWait(driver,timeout=30).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-        print("You're through")
-    except:
-        print("You did not login succesfully")
-        return 
-    
-
-    times.sleep(10)
-    print("yo")
-
-    for key in patient_dict:
-        #print(key)
-        date = patient_dict[key]['encounter_date']
-        time = patient_dict[key]['encounter_time']
-        ident = patient_dict[key]['encounter_id']
-        first_name = patient_dict[key]['first_name']
-        last_name = patient_dict[key]['last_name']
-        DOB = patient_dict[key]['date_of_birth']
-        age = patient_dict[key]['age_at_presentation']
-        gender = patient_dict[key]['gender']
-        medicare = patient_dict[key]['medicare_number']
-        atsi =  patient_dict[key]['indigenous_status']
-        address = patient_dict[key]['address_line1']
-        suburb = patient_dict[key]['suburb']
-        state = patient_dict[key]['state']
-        postcode = patient_dict[key]['postcode']
-        emergency = patient_dict[key]['emergency_contact_name']
-        birth_country = patient_dict[key]['country_of_birth']
-        language = patient_dict[key]['home_language']
-        symptoms = patient_dict[key]['patient_symptoms']
-        meds = patient_dict[key]['usual_medications']
-        specimen = patient_dict[key]['specimen_collected']
-        diagnosis = patient_dict[key]['diagnosis']
-        outcome = patient_dict[key]['outcome']
-        patient = patient_class.Patient(date,time,ident,first_name, last_name, DOB, age, gender, medicare, atsi, address, suburb, state, postcode, emergency, birth_country, language, symptoms, meds,specimen, diagnosis, outcome )
-        print(patient.first_name+ " " + patient.last_name + " " + gender + f"{ident}")
-    
-        try: 
-            WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-
-            exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
-            exisiting_patient_button.click()
-
-            times.sleep(5)
-            encounter_id_input = driver.find_element_by_xpath('//*[@id="encounterId"]')
-            
-            encounter_id_input.send_keys(ident)
-            search_button = driver.find_element_by_class_name('btn.btn-dark')
-            search_button.click()
-            times.sleep(5)
-
-            try:
-
-                new_encounter_button = driver.find_element_by_link_text("New Encounter")
-                #new_encounter_button.click()
-                #checkbox
-                #no_symptoms_button = driver.find_element_by_xpath('//*[@id="encounter_symptoms_choice"]/div[20]/label')
-                #tickbox
-                #usual_medications = driver.find_element_by_xpath('//*[@id="encounter_usualMedications"]')
-                #speciman dropdon
-                #speciman = driver.find_element_by_xpath('//*[@id="encounter_specimenCollected"]')
-                #diagnosis dropdown
-                #diagnosis_field = driver.find_element_by_xpath('//*[@id="encounter_diagnosis_choice"]')
-                #outocme  dropdown
-                #outcome_outcome = driver.find_element_by_xpath('//*[@id="encounter_outcome_choice"]')
-
-                #certificate dropdown 
-                #certificate = driver.find_element_by_xpath('//*[@id="encounter_outcome_choice"]')
-
-                #sumbmit 
-                #submit = driver.find_element_by_xpath('//input[@type="submit"]')
-                print("Patient found" + first_name)
-                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
-            
-        
-            except: 
-                ##write this patient and their details to the new patient dict. 
-                print("This is a new patient." + first_name)
-                new_patients_counter += 1
-                new_patients[new_patients_counter] = patient_dict["key"]
-                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
-                
-
-
-        except:
-            #exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
-            #exisiting_patient_button.click()
-            times.sleep(10)
-            print("Couldn't Click Existing Assement Patients Button or Error with Encounter ID")
-
-        
-
-        
-       
-    
-
-    
-automate(data_to_use,  ss)
-
-'''
 
 
 
