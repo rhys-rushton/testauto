@@ -1,4 +1,8 @@
-#import the user class object
+#in this file the encounters for patients who already exist in the registered patient database are completed. 
+#the output files are located in csv/existing_patients_output
+#the script will only ad encounters for those who have not had their encounter uploaded. 
+#all actions are recorded and logged. 
+
 from classes import userClass, patientClass
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys 
@@ -9,72 +13,39 @@ import time as times
 from csvOperations import spread
 import csv
 from random import randrange
+from csvOperations.fields import fields as field_data
+from auto_funcs.date_string_zeroes import remove_zeroes
+from auto_funcs.login import login
+from auto_funcs.symptoms import symptoms
 
-fields = ['FILE_NUMBER', 'FAMILY_NAME_x','GIVEN_NAME_x','HOME_ADDRESS_LINE_1_x',
-            'HOME_ADDRESS_LINE_2_x','HOME_SUBURB_TOWN_x ','HOME_POSTCODE_x ',
-            'HOME_PHONE_x','AGE_x', 'GENDER_x','LAST_IN_x', 'DATE_OF_BIRTH',
-            'PATIENT_ID', 'MEDIRCARE_NUMBER_WREF', 'encounter_date', 'encounter_time',
-            'encounter_id','first_name', 'last_name', 'date_of_birth', 'age_at_presentation',
-            'gender', 'success_code', 'error_code']
+fields = field_data
 
 #get the existing patients. 
 data_to_use = spread.existing_patients
 
-#login. 
-em = input("enter email please ")
-pw = input("enter pword")
-user = userClass.User(em, pw)
-driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
 
+#result of automation. 
 encounter_success = []
-
 encounter_error = []
-
-
-
-def rand_symp_array (range):
-
-    number = randrange(range)
-    return number
-
-def rand_symp_num (range):
-
-    number =  randrange(range)
-    return number
+already_entered = []
 
 def automate():
-    print("Have your authentication ready please")
-    #driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
-    driver.get("https://app.respiratoryclinic.com.au/login")
-    userName = driver.find_element_by_id("inputUsername")
-    passWord = driver.find_element_by_id("inputPassword")
-    firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
-    userName.clear()
-    passWord.clear()
-    userName.send_keys(user.email)
-    passWord.send_keys(user.password)
-    firstSignIn.click()
-    print("Please enter you're authentication code")
 
-    #wait for user to enter authentication code. 
-    try:
-        WebDriverWait(driver,timeout=120).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-        print("You're through")
-    except:
-        print("You did not enter authentication code succesfully")
-        return 
-    
+    driver = login()
 
     try: 
         for key in data_to_use:
+
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
             data_to_use[key]['error_code'] = ''
 
             if key > 10: 
                 break
-            driver.get("https://app.respiratoryclinic.com.au/login")
+
             encounter_id = data_to_use[key]['encounter_id']
             encounter_date = data_to_use[key]['LAST_IN_x'][0:10]
+            encounter_date = remove_zeroes(encounter_date)
 
             existing_assement_button = driver.find_element_by_link_text('Existing Assessment Patients')
             existing_assement_button.click()
@@ -84,6 +55,17 @@ def automate():
 
             search_button = driver.find_element_by_class_name('btn.btn-dark')
             search_button.click()
+
+            try:
+                assert encounter_date in driver.page_source
+                print('Encounter already entered')
+                data_to_use[key]['error_code'] = 'Encounter Already Entered'
+                already_entered.append(data_to_use[key])
+                continue
+            
+            except:
+                print('Patient encounter has not yet been entered')
+
 
             new_encounter_button = driver.find_element_by_link_text("New Encounter")
             new_encounter_button .click()
@@ -97,12 +79,12 @@ def automate():
             joint_pain = driver.find_element_by_id('encounter_symptoms_choice_Jointpain')
 
             array_of_symptoms = [fever_box, cough_box, sore_throat, tiredness, runny_nose, headache, joint_pain]
-            num_symptoms = rand_symp_num(6)
+            num_symptoms = symptoms(6)
 
             counter = 0
 
             while counter < num_symptoms:
-                randome_index = rand_symp_array(6)
+                randome_index = symptoms(6)
                 symptom_to_click = array_of_symptoms[randome_index]
                 if symptom_to_click.is_selected() == False:
                     
@@ -132,23 +114,27 @@ def automate():
             elif random_hour < 12:
                 encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
 
-            times.sleep(20)
-            save_button = driver.find_element_by_css_selector('btn.btn-dark')
-            #save_button.click()
+            times.sleep(5)
+            save_button = driver.find_element_by_class_name('btn.btn-dark')
 
             try:
+                #save_button.click()
                 WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
                 print("patient success")
                 encounter_success.append(data_to_use[key])
+                continue
+
             except Exception as e:
                 print("patient error")
                 data_to_use[key]['error_code'] = e
                 encounter_error.append(data_to_use[key])
-       
+                continue
 
     except Exception as e:
+
         print('Error')
         data_to_use[key]['error_code'] = e
+        print(e)
         encounter_error.append(data_to_use[key])
         
 
@@ -166,3 +152,10 @@ with open(r'H:\testauto\csv\existing_patients_output\encounter_success.csv', 'w'
     writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
     writer.writeheader()
     writer.writerows(encounter_success)
+
+#write patients who have had encounters entered to csv
+with open(r'H:\testauto\csv\existing_patients_output\already_done.csv', 'w', newline='') as f: 
+    writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(already_entered)
+

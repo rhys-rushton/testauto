@@ -15,6 +15,7 @@ dsp_and_redrc_df.fillna('', inplace=True)
 pd.set_option('display.float_format', lambda x: '%.0f' % x)
 dsp_and_redrc_df.MEDICARE_NUMBER = dsp_and_redrc_df.MEDICARE_NUMBER.astype(str)
 dsp_and_redrc_df.HOME_POSTCODE_x = dsp_and_redrc_df.HOME_POSTCODE_x.astype(str)
+dsp_and_redrc_df = dsp_and_redrc_df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
 
 #create a copy of the dspandredrc data to play around with for medicare matching. 
@@ -51,6 +52,7 @@ fields_for_rhino = ['encounter_date', 'encounter_time', 'encounter_id', 'first_n
 rhino_data = pd.read_csv(r'H:\testauto\csvOperations\rhinodata\rhinoapp.csv',dtype={'medicare_number': 'str'}, header=0, usecols= fields_for_rhino)
 rhino_data['medicare_number'] = rhino_data['medicare_number'].astype(str)
 rhino_data.fillna('', inplace=True)
+rhino_data = rhino_data.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
 #using a copy below just so nothing gets stuffed up. 
 #below we are cleaning data
@@ -98,11 +100,9 @@ new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
 #print(prexisting_df.shape[0])
 #print(new_patients.shape[0])
 
-
 #write the patients with no medicare to csv file. 
 no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
 #print(prexisting_df['LAST_IN_x'][0:10])
-
 
 new_patients = (new_patients.transpose()).to_dict()
 #print(new_patients[0]['LAST_IN_x'][0:10])

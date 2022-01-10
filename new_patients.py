@@ -1,4 +1,4 @@
-from classes import userClass, patientClass
+from classes import userClass
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -8,14 +8,13 @@ import time as times
 from csvOperations import spread
 import csv
 from random import randrange
+from auto_funcs.date_string_zeroes import remove_zeroes
+from auto_funcs.login import login
+from auto_funcs.symptoms import symptoms
+from csvOperations.fields import fields as field_data
 
 
-fields = ['FILE_NUMBER', 'FAMILY_NAME_x','GIVEN_NAME_x','HOME_ADDRESS_LINE_1_x',
-            'HOME_ADDRESS_LINE_2_x','HOME_SUBURB_TOWN_x ','HOME_POSTCODE_x ',
-            'HOME_PHONE_x','AGE_x', 'GENDER_x','LAST_IN_x', 'DATE_OF_BIRTH',
-            'PATIENT_ID', 'MEDIRCARE_NUMBER_WREF', 'encounter_date', 'encounter_time',
-            'encounter_id','first_name', 'last_name', 'date_of_birth', 'age_at_presentation',
-            'gender', 'success_code', 'error_code']
+fields = field_data
 
 #registration data structures
 new_patients_succesfully_entered = []
@@ -30,44 +29,17 @@ print("Hey you are running the new patients script")
 #import the new patient data
 new_patient_data = spread.new_patients
 
-#create the user class
-em = input("enter email please ")
-pw = input("enter pword")
-user = userClass.User(em, pw)
-driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
-
-def main ():
-    print("Please get your google auth ready")
-    times.sleep(10)
-    driver.get("https://app.respiratoryclinic.com.au/login")
-    userName = driver.find_element_by_id("inputUsername")
-    passWord = driver.find_element_by_id("inputPassword")
-    firstSignIn = driver.find_element_by_xpath("//*[@id=\"regular-login\"]/button")
-    userName.clear()
-    passWord.clear()
-    userName.send_keys(user.email)
-    passWord.send_keys(user.password)
-    firstSignIn.click()
-    print("Please enter you're authentication code")
-
-    #wait for user to enter authentication code. 
-    try:
-        WebDriverWait(driver,timeout=120).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-        print("You're through")
-    except:
-        print("You did not enter authentication code succesfully")
-        return 
-    
-    new_patient_registration()
-
 
 def new_patient_registration():
     print('We are now uploading new patients')
-    
+    driver = login()
 
     for key in new_patient_data:
         #if key > 10: 
             #break
+        driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+
+        WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
         given_name = new_patient_data[key]['GIVEN_NAME_x']   
         surname = new_patient_data[key]['FAMILY_NAME_x']
         DOB = new_patient_data[key]['DATE_OF_BIRTH']
@@ -75,9 +47,11 @@ def new_patient_registration():
         medicare = new_patient_data[key]['MEDIRCARE_NUMBER_WREF']
         adress_1 = new_patient_data[key]['HOME_ADDRESS_LINE_1_x'] 
         suburb = new_patient_data[key]['HOME_SUBURB_TOWN_x']
-        postcode = new_patient_data[key]['HOME_POSTCODE_x'] 
+        postcode = new_patient_data[key]['HOME_POSTCODE_x']
+        encounter_date = new_patient_data[key]['LAST_IN_x'][0:10]
 
-        WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        #we want to double check that this patient doesn't exist. 
+        
 
         try:
             new_assesment_patient_button = driver.find_element_by_link_text("New Assessment Patient")
@@ -180,8 +154,9 @@ def new_patient_registration():
             #for vax. 
             try: 
                 potential_dup = driver.find_element_by_class_name('alert.alert-warning')
-                
-                save_button.click()
+                print('Potential Duplicate')
+                times.sleep(2)
+                #save_button.click()
                 new_patients_succesfully_entered.append(new_patient_data[key])  
                 times.sleep(1)
                 #new_patient_add_encounter(new_patient_data, key)
@@ -192,16 +167,16 @@ def new_patient_registration():
                     new_patients_succesfully_entered.append(new_patient_data[key])
                     #new_patient_add_encounter(new_patient_data, key)
                    
-                else:
-                    new_patients_w_error.append(new_patient_data[key])
-                    times.sleep(1)
+                
 
             #add the encounter for the patient
-            #new_patient_add_encounter(new_patient_data, key)
+            
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
-        except:
+        except Exception as e:
             print("Hey this is error in new patient upload ")
+            print(e)
+            times.sleep(5)
             new_patients_w_error.append(new_patient_data[key])
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
 
@@ -221,7 +196,7 @@ with open(r'H:\testauto\csv\new_patient_rego_opt\new_error.csv', 'w', newline=''
 
 #new patient add encounter
 #this is where we add the encounter. 
-def new_patient_add_encounter(new_patient_data, key):
+def new_patient_add_encounter(new_patient_data, key, driver):
     print("hey")
 
 
@@ -275,11 +250,4 @@ def new_patient_add_encounter(new_patient_data, key):
     #make sure to write errors and succeses to csv
 
 
-
- 
-    
-    
-
-
-main()
 

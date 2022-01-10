@@ -12,9 +12,11 @@ import csv
 ###############
 ###NEED TO CHANGE BELOw[remove 0]
 #data_to_use = spread.data_done_date
-#print(data_to_use)
-data_to_use = spread.dsp_and_redrc_df
-print(data_to_use[1])
+
+#data_to_use = spread.dsp_and_redrc_df
+
+data_to_use = spread.new_patients
+
 
 #patients who are new
 #eventually this will be updated and not relevant. 
@@ -55,6 +57,7 @@ def automate():
         #just for testing purposes
         #if key > 10: 
             #break
+        driver.get("https://app.respiratoryclinic.com.au/dashboard/")
         given_name = data_to_use[key]['GIVEN_NAME_x']   
         surname = data_to_use[key]['FAMILY_NAME_x']
         DOB = data_to_use[key]['DATE_OF_BIRTH']
@@ -81,21 +84,34 @@ def automate():
 
             try:
                 #check if no results pop up. 
-                #new_patient_text = driver.find_element_by_xpath("//*[contains(text(), 'No results.')]").is_displayed()
-                patient_dob = driver.find_element_by_xpath(f"//*[contains(text(), '{DOB}')]").is_displayed()
-                patient_name = driver.find_element_by_xpath(f"//*[contains(text(), '{DOB + ' ' + given_name}')]").is_displayed()
+                new_patient_text = driver.find_element_by_xpath("//*[contains(text(), 'No results.')]").is_displayed()
                 print("new patient")
                 driver.get("https://app.respiratoryclinic.com.au/dashboard/")
                 #add to new patient key. 
                 new_patients.append(data_to_use[key])
-                #print(new_patients)
+                continue
             
             except Exception as e:
-                #print(e)
-                print("Prexisting")
-                driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+                print('Potentially prexisting')
+
+            try: 
+                if DOB[0] == '0' and DOB[3] == '0':
+                    DOB = DOB[1:3] + DOB[4:]
+
+                elif DOB[0] == '0':
+                    DOB = DOB[1:]
+
+                elif DOB[0] != '0' and DOB[3] == '0':
+                    DOB = DOB[0:3] + DOB[4:]
+
+                assert DOB in driver.page_source
                 pre_existing_patients.append(data_to_use[key])
-                
+                continue
+
+            except:
+                print('Patient doesnt exist')
+                new_patients.append(data_to_use[key])
+
         except Exception as e:
             print(e)
             print("an error has occured in load this patient")
@@ -110,12 +126,12 @@ def automate():
         writer.writeheader()
         writer.writerows(pre_existing_patients)
 
-    new_assesment_patient(fields)
+    #new_assesment_patient(fields)
       
 
 
 
-#this function is where we fill in all the information
+#this is the function where we register the new patient. 
 def new_assesment_patient(fields):
 
     for el in range(len(new_patients)):
