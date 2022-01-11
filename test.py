@@ -18,8 +18,8 @@ def automate():
 
 
  
-    encounter_id = 'Name'
-    encounter_date = 'DOB'
+    encounter_id = 'Rushton'
+    encounter_date = '05/03/1961'
     
     encounter_date = remove_zeroes(encounter_date)
     #print(encounter_date)
@@ -45,6 +45,8 @@ def automate():
         try: 
             assert encounter_date in div.get_attribute('innerHTML')
             print(div.text)
+            div.find_element_by_link_text('New Encounter').click()
+            times.sleep(5)
             
 
         except:
@@ -60,7 +62,7 @@ def automate():
 
 
 
-automate()
+#automate()
 
 
 

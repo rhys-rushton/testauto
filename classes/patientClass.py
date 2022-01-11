@@ -34,8 +34,8 @@ class Patient():
 
 
 #basic testing class
-class p_basic():
-    def __init__(self, name, surname, DOB, gender,medicare, address, suburb, post_code, encounter_id):
+class patient():
+    def __init__(self, name, surname, DOB, gender,medicare, address, suburb, post_code, date, error=''):
         self.name = name
         self.surname = surname
         self.DOB = DOB
@@ -44,6 +44,7 @@ class p_basic():
         self.address = address
         self.suburb = suburb
         self.post_code = post_code
-        self.endounter_id = encounter_id
+        self.date = date
+        self.error = error
 
 
