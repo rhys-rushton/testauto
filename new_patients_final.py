@@ -12,6 +12,7 @@ from auto_funcs.date_string_zeroes import remove_zeroes
 from auto_funcs.login import login
 from auto_funcs.symptoms import symptoms
 from csvOperations.fields import fields as field_data
+from auto_funcs.look_for_date import look_for_date
 
 
 fields = field_data
@@ -28,6 +29,81 @@ new_patient_encounter_error = []
 print("Hey you are running the new patients script")
 #import the new patient data
 new_patient_data = spread.new_patients
+
+
+def add_encounter(patient_obj, driver):
+    try:
+        WebDriverWait(driver,timeout=120).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        times.sleep(5)
+        add_encounter_button = driver.find_element_by_link_text("Add Encounter")
+        add_encounter_button.click()
+
+    except Exception as e: 
+        print(e)
+        print("Error in new function")
+        #add patient to error list
+        return 
+
+    fever_box = driver.find_element_by_id('encounter_symptoms_choice_Feverselfreported')
+    cough_box = driver.find_element_by_id('encounter_symptoms_choice_Cough')
+    sore_throat = driver.find_element_by_id('encounter_symptoms_choice_Sorethroat')
+    tiredness = driver.find_element_by_id('encounter_symptoms_choice_Tirednesslethargy')
+    runny_nose = driver.find_element_by_id('encounter_symptoms_choice_Headache')
+    headache = driver.find_element_by_id('encounter_symptoms_choice_Headache')
+    joint_pain = driver.find_element_by_id('encounter_symptoms_choice_Jointpain')
+
+    array_of_symptoms = [fever_box, cough_box, sore_throat, tiredness, runny_nose, headache, joint_pain]
+    num_symptoms = symptoms(6)
+
+    counter = 0
+
+    while counter < num_symptoms:
+        randome_index = symptoms(6)
+        symptom_to_click = array_of_symptoms[randome_index]
+        if symptom_to_click.is_selected() == False:
+            symptom_to_click.click()
+
+        counter += 1
+
+        no_usual_meds = driver.find_element_by_id('no_usual_medications')
+        no_usual_meds.click()
+
+        diagnosis = Select(driver.find_element_by_id('encounter_diagnosis_choice'))
+        diagnosis.select_by_visible_text('Other (specify)')
+        driver.find_element_by_id('encounter_diagnosis_other').send_keys('Possible covid')
+    
+        encounter_date = driver.find_element_by_id('encounter_encounterDate')
+        encounter_date.clear()
+        encounter_date.send_keys(patient_obj.date[0:10])
+        
+        random_hour = randrange(9, 19)
+        random_minute = randrange(59)
+        
+        encounter_time = driver.find_element_by_name('encounter_time')
+        encounter_time.clear()
+
+        if random_hour >= 12:
+            encounter_time.send_keys(f'{random_hour}:{random_minute}PM')
+
+        elif random_hour < 12:
+            encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
+
+        times.sleep(5)
+        save_button = driver.find_element_by_class_name('btn.btn-dark')
+
+        try:
+            save_button.click()
+            WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+            print("patient success")
+            #add patient to success
+         
+
+        except Exception as e:
+            print("patient error")
+            #add patient to error
+            
+
+
 
 
 def check_patient_exists(patient_object, driver):
@@ -51,13 +127,27 @@ def check_patient_exists(patient_object, driver):
     except:
 
         #want to check if their DOB is there
-        #if it isn't then return false
-        # i it is: 
-            #if DOB is there then we want to check for their encounter date
+        date_of_birth = remove_zeroes(patient_object.DOB)
+        date_of_birth_present = look_for_date(date_of_birth, driver)
 
-        driver.get("https://app.respiratoryclinic.com.au/dashboard/")
-        return True
-        
+        if date_of_birth_present == True:
+            encounter_date = remove_zeroes(patient_object.date)
+            encounter_date_present = look_for_date(encounter_date, driver)
+
+            if encounter_date_present == True:
+                return True
+            else:
+                #need to add encounter
+                new_encounter_button = driver.find_element_by_link_text("New Encounter")
+                new_encounter_button.click()
+                add_encounter(patient_object, driver)
+                return True
+
+        else:
+            #patient doesn't exist. 
+            driver.get("https://app.respiratoryclinic.com.au/dashboard/")
+            return False
+
 def register_patient(patient_obj, driver):
     print('hey we are registering a patient')
 
@@ -72,7 +162,7 @@ def register_patient(patient_obj, driver):
         new_patients_w_error.append(patient_obj)
         return
 
-    #uploaed patient information
+    #upload patient information
     try:
         name_field = driver.find_element_by_id('patient_firstName')
         name_field.send_keys(patient_obj.name)
@@ -109,32 +199,72 @@ def register_patient(patient_obj, driver):
             patient_medicare_ref.send_keys(patient_obj.medicare[10])
 
 
+        state_field = Select(driver.find_element_by_id('patient_state'))
+        if(patient_obj.post_code[0]) == '2': 
+            state_field.select_by_visible_text('NSW')
 
-    except:
-        print('Error with name.')
+        elif(patient_obj.post_code[0]) == '3':
+            state_field.select_by_visible_text('VIC')
 
-    
+        elif(patient_obj.post_code[0]) == '4':
+            state_field.select_by_visible_text('QLD')
+
+        elif(patient_obj.post_code[0]) == '5':
+            state_field.select_by_visible_text('SA')
+
+        elif(patient_obj.post_code[0]) == '6':
+            state_field.select_by_visible_text('WA')
+
+        elif(patient_obj.post_code[0]) == '7':
+            state_field.select_by_visible_text('TAS')
+
+        elif(patient_obj.post_code[0]) == '0':
+            state_field.select_by_visible_text('NT')
+
         
+        emergency_field = driver.find_element_by_id('patient_emergencyContactName')
+        emergency_field.send_keys('Nil Provided')
 
 
+        country_of_birth = Select(driver.find_element_by_id('patient_countryOfBirth_choice'))
+        country_of_birth.select_by_visible_text('Not stated')
+
+        home_language = Select(driver.find_element_by_id('patient_homeLanguage_choice'))
+        home_language.select_by_visible_text('Not stated')
+
+        patient_symptoms_other = driver.find_element_by_id('patient_symptoms_choice__other')
+        patient_symptoms_other.click()
+
+        driver.find_element_by_id('patient_symptoms_other').send_keys('See encounter')
+        driver.find_element_by_id('patient_reportConsent_yes').click()
+
+        save_button = driver.find_element_by_class_name('btn.btn-dark')
+        save_button.click()
+
+        url = driver.current_url()
+
+        if url == 'https://app.respiratoryclinic.com.au/dashboard/':
+            #new patient succesfully registered
+            add_encounter(patient_obj, driver)
+        else: 
+            try: 
+                potential_dup = driver.find_element_by_class_name('alert.alert-warning')
+                print('Potential Duplicate')
+                times.sleep(2)
+                save_button.click()
+                #new patient succesfully registered
+                add_encounter(patient_obj, driver)
+
+                
+
+            except:
+                #unable to register patient, encounter outstanding. 
+                print('hello')
 
 
-
-
-
-def add_encounter(patient_obj, driver):
-    print('hey')
-
-
-
-
-
-
-
-
-
-
-
+    except Exception as e:
+        #unable to register patient, encounter outstanding. 
+        print('Error uploading data')
 
 
 
@@ -168,18 +298,13 @@ def new_patient_main():
         patient_exists = check_patient_exists(patient_obj, driver)
 
         if patient_exists == False:
-            #we then want to register and do encounter. 
+            #we then want to register and do encounter. We will call the encounter function from register patient function.  
             print('Patient DNE')
-            #register_patient(patient_obj, driver)
+            register_patient(patient_obj, driver)
             continue
         elif patient_exists == True: 
             print('Patient Exists')
             continue
-
-
-            
-
-                    
 
 new_patient_main()
             

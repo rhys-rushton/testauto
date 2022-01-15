@@ -68,7 +68,7 @@ def automate():
 
 
             new_encounter_button = driver.find_element_by_link_text("New Encounter")
-            new_encounter_button .click()
+            new_encounter_button.click()
 
             fever_box = driver.find_element_by_id('encounter_symptoms_choice_Feverselfreported')
             cough_box = driver.find_element_by_id('encounter_symptoms_choice_Cough')
@@ -118,7 +118,7 @@ def automate():
             save_button = driver.find_element_by_class_name('btn.btn-dark')
 
             try:
-                #save_button.click()
+                save_button.click()
                 WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
                 print("patient success")
                 encounter_success.append(data_to_use[key])
