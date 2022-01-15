@@ -1,11 +1,27 @@
-# testauto
-a python script to automate the uploading of testing results. 
+# Automation Tool for Uploading Vaccination Data for COVID-19 (AUSTRALIA)
+This is a python cli application that enables users to automate the uploading of data to the Australian Government's Respiratory Clinic app. 
+In order to use this app. you will need to be a registered user on the government respiratory clinic app. and you will also need access to the relevant patient
+management system for sourcing data. The two data sources I have been using is Aspen Medical's Rhino app and Zedmed. If you are using other data sources you will 
+need to do your own data cleaning but you can use my work for reference (see ./csvOperations). 
+The web automated code should be reusable for anyone, however if the government makes any changes to the id codes for webelements then the app will break, however these errors
+will be caught and documented. 
 
 
-# Libraries being Used 
+# Table of Contents 
 
-Beautiful Soup 
-https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+# How to Run and Install
+
+# How to Use
+
+# Credits
+
+# Lisence 
+
+# Badges
+
+# Tests 
+
+
 
 CSV Module Python 
 https://docs.python.org/3/library/csv.html
