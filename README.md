@@ -60,6 +60,7 @@ This is the automation script for registering new patients.
 3000 -> follow up. 
 2000 -> booster 
 500 -> check for medicare against rhino data and put those that are not in rhino into respiratory clinic app. put those that are in rhino app into prexisting. 
+500 -> patients who are duplicates
 
 
 empty addreses for new pateients

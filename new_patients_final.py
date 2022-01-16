@@ -12,18 +12,18 @@ from auto_funcs.date_string_zeroes import remove_zeroes
 from auto_funcs.login import login
 from auto_funcs.symptoms import symptoms
 from csvOperations.fields import fields as field_data
-from auto_funcs.look_for_date import look_for_date
+from auto_funcs.look_for_date import look_for_date, find_date_click
+import traceback
 
 
 fields = field_data
 
 #registration data structures
-new_patients_succesfully_entered = []
-new_patients_w_error = []
-
-#new_patient_encounter_registration
-new_patient_encounter = []
-new_patient_encounter_error = []
+patient_registered = []
+patient_encounter_success = []
+patient_registration_error = []
+patient_encounter_error = []
+prexisting = []
 
 
 print("Hey you are running the new patients script")
@@ -33,74 +33,83 @@ new_patient_data = spread.new_patients
 
 def add_encounter(patient_obj, driver):
     try:
-        WebDriverWait(driver,timeout=120).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-        times.sleep(5)
+        WebDriverWait(driver,timeout=4).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+        
         add_encounter_button = driver.find_element_by_link_text("Add Encounter")
         add_encounter_button.click()
 
     except Exception as e: 
         print(e)
-        print("Error in new function")
-        #add patient to error list
-        return 
 
-    fever_box = driver.find_element_by_id('encounter_symptoms_choice_Feverselfreported')
-    cough_box = driver.find_element_by_id('encounter_symptoms_choice_Cough')
-    sore_throat = driver.find_element_by_id('encounter_symptoms_choice_Sorethroat')
-    tiredness = driver.find_element_by_id('encounter_symptoms_choice_Tirednesslethargy')
-    runny_nose = driver.find_element_by_id('encounter_symptoms_choice_Headache')
-    headache = driver.find_element_by_id('encounter_symptoms_choice_Headache')
-    joint_pain = driver.find_element_by_id('encounter_symptoms_choice_Jointpain')
-
-    array_of_symptoms = [fever_box, cough_box, sore_throat, tiredness, runny_nose, headache, joint_pain]
-    num_symptoms = symptoms(6)
-
-    counter = 0
-
-    while counter < num_symptoms:
-        randome_index = symptoms(6)
-        symptom_to_click = array_of_symptoms[randome_index]
-        if symptom_to_click.is_selected() == False:
-            symptom_to_click.click()
-
-        counter += 1
-
-        no_usual_meds = driver.find_element_by_id('no_usual_medications')
-        no_usual_meds.click()
-
-        diagnosis = Select(driver.find_element_by_id('encounter_diagnosis_choice'))
-        diagnosis.select_by_visible_text('Other (specify)')
-        driver.find_element_by_id('encounter_diagnosis_other').send_keys('Possible covid')
+        times.sleep(2)
     
-        encounter_date = driver.find_element_by_id('encounter_encounterDate')
-        encounter_date.clear()
-        encounter_date.send_keys(patient_obj.date[0:10])
+    try:
+
+
+        fever_box = driver.find_element_by_id('encounter_symptoms_choice_Feverselfreported')
+        cough_box = driver.find_element_by_id('encounter_symptoms_choice_Cough')
+        sore_throat = driver.find_element_by_id('encounter_symptoms_choice_Sorethroat')
+        tiredness = driver.find_element_by_id('encounter_symptoms_choice_Tirednesslethargy')
+        runny_nose = driver.find_element_by_id('encounter_symptoms_choice_Headache')
+        headache = driver.find_element_by_id('encounter_symptoms_choice_Headache')
+        joint_pain = driver.find_element_by_id('encounter_symptoms_choice_Jointpain')
+
+        array_of_symptoms = [fever_box, cough_box, sore_throat, tiredness, runny_nose, headache, joint_pain]
+        num_symptoms = symptoms(6)
+
+        counter = 0
+
+        while counter < num_symptoms:
+            randome_index = symptoms(6)
+            symptom_to_click = array_of_symptoms[randome_index]
+            if symptom_to_click.is_selected() == False:
+                symptom_to_click.click()
+
+            counter += 1
+
+            no_usual_meds = driver.find_element_by_id('no_usual_medications')
+            no_usual_meds.click()
+
+            diagnosis = Select(driver.find_element_by_id('encounter_diagnosis_choice'))
+            diagnosis.select_by_visible_text('Other (specify)')
+            driver.find_element_by_id('encounter_diagnosis_other').send_keys('Possible covid')
         
-        random_hour = randrange(9, 19)
-        random_minute = randrange(59)
-        
-        encounter_time = driver.find_element_by_name('encounter_time')
-        encounter_time.clear()
+            encounter_date = driver.find_element_by_id('encounter_encounterDate')
+            encounter_date.clear()
+            encounter_date.send_keys(patient_obj.date[0:10])
+            
+            random_hour = randrange(9, 19)
+            random_minute = randrange(59)
+            
+            encounter_time = driver.find_element_by_name('encounter_time')
+            encounter_time.clear()
 
-        if random_hour >= 12:
-            encounter_time.send_keys(f'{random_hour}:{random_minute}PM')
+            if random_hour >= 12:
+                encounter_time.send_keys(f'{random_hour}:{random_minute}PM')
 
-        elif random_hour < 12:
-            encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
+            elif random_hour < 12:
+                encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
 
-        times.sleep(5)
-        save_button = driver.find_element_by_class_name('btn.btn-dark')
+            times.sleep(2)
+            save_button = driver.find_element_by_class_name('btn.btn-dark')
 
-        try:
+            
             save_button.click()
-            WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-            print("patient success")
-            #add patient to success
+            WebDriverWait(driver,timeout=3).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+            #any errors are caught in the check patient function. 
+            print('encounter added')
+            return
+
+    except Exception as e: 
+        print("Encounter not added")
+        print(e)
+        times.sleep(2)
+        return 
+            
          
 
-        except Exception as e:
-            print("patient error")
-            #add patient to error
+        
+            
             
 
 
@@ -135,18 +144,38 @@ def check_patient_exists(patient_object, driver):
             encounter_date_present = look_for_date(encounter_date, driver)
 
             if encounter_date_present == True:
+                prexisting.append(patient_object)
+                print('encounter already there')
                 return True
             else:
                 #need to add encounter
-                new_encounter_button = driver.find_element_by_link_text("New Encounter")
-                new_encounter_button.click()
-                add_encounter(patient_object, driver)
-                return True
+                #get to the right div if there are multiple, using patient DOB
+                try:
+                    find_date_click(date_of_birth,driver)
+                except Exception as e:
+                    patient_object.error = e
+                    patient_encounter_error.append(patient_object)
+                    return False
+
+                #add the encounter. 
+                try:
+                    add_encounter(patient_object, driver)
+                   
+                    patient_encounter_success.append(patient_object)
+                    return True
+
+                except Exception as e:
+                    patient_object.error = e 
+                    patient_encounter_error.append(patient_object)
+                    return True
+                    
+                    
 
         else:
             #patient doesn't exist. 
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
             return False
+
 
 def register_patient(patient_obj, driver):
     print('hey we are registering a patient')
@@ -157,9 +186,10 @@ def register_patient(patient_obj, driver):
         new_assesment_patient_button.click()
 
     except Exception as e: 
-        print(e)
         patient_obj.error = e
-        new_patients_w_error.append(patient_obj)
+        patient_registration_error.append(patient_obj)
+        print(e)
+        times.sleep(2)
         return
 
     #upload patient information
@@ -197,6 +227,15 @@ def register_patient(patient_obj, driver):
             patient_medicare_ref = driver.find_element_by_id('patient_medicareReferenceNumber')
             patient_medicare_num.send_keys(patient_obj.medicare[0:10])
             patient_medicare_ref.send_keys(patient_obj.medicare[10])
+
+        
+        adress_line_1 = driver.find_element_by_id('patient_addressLine1')
+        adress_line_1.send_keys(patient_obj.address)
+        suburb_field = driver.find_element_by_id('patient_suburb')
+        suburb_field.send_keys(patient_obj.suburb)
+        postcode_field = driver.find_element_by_id('patient_postcode')
+        postcode_field.send_keys(patient_obj.post_code)
+
 
 
         state_field = Select(driver.find_element_by_id('patient_state'))
@@ -241,29 +280,37 @@ def register_patient(patient_obj, driver):
         save_button = driver.find_element_by_class_name('btn.btn-dark')
         save_button.click()
 
-        url = driver.current_url()
+        url = driver.current_url
 
         if url == 'https://app.respiratoryclinic.com.au/dashboard/':
-            #new patient succesfully registered
+            
             add_encounter(patient_obj, driver)
         else: 
             try: 
+                times.sleep(2)
                 potential_dup = driver.find_element_by_class_name('alert.alert-warning')
+                
                 print('Potential Duplicate')
                 times.sleep(2)
+                save_button = driver.find_element_by_class_name('btn.btn-dark')
                 save_button.click()
                 #new patient succesfully registered
+                patient_registered.append(patient_obj)
                 add_encounter(patient_obj, driver)
 
-                
-
-            except:
+            except Exception as e:
                 #unable to register patient, encounter outstanding. 
-                print('hello')
-
+                print(e)
+                times.sleep(2)
+                patient_registration_error.append(patient_obj)
+                
 
     except Exception as e:
         #unable to register patient, encounter outstanding. 
+        print(e)
+        print(traceback.format_exc())
+        times.sleep(2)
+        patient_registration_error.append(patient_obj)
         print('Error uploading data')
 
 
@@ -275,9 +322,9 @@ def new_patient_main():
 
     #iterate through data
     for key in new_patient_data:
-        if key > 10:
-            print('We done')
-            break
+        #if key > 100:
+            #print('We done')
+            #break
         driver.get("https://app.respiratoryclinic.com.au/dashboard/")
         WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
 
@@ -307,6 +354,41 @@ def new_patient_main():
             continue
 
 new_patient_main()
-            
-        
-     
+
+#patient registration success
+with open(r'H:\testauto\csv\new_patient_rego_opt\patient_rego_succ.csv', 'w', newline='') as f: 
+    writer = csv.writer(f)
+    writer.writerow([fields])
+    for patient in patient_registered:
+        writer.writerow([patient.name,patient.surname, patient.DOB, patient.gender, patient.medicare, patient.address,patient.suburb, patient.post_code, patient.date, patient.error ])
+
+#patient registration error
+with open(r'H:\testauto\csv\new_patient_rego_opt\patient_rego_err.csv', 'w', newline='') as f: 
+    writer = csv.writer(f)
+    writer.writerow([fields])
+    for patient in patient_registration_error:
+        writer.writerow([patient.name,patient.surname, patient.DOB, patient.gender, patient.medicare, patient.address,patient.suburb, patient.post_code, patient.date, patient.error ])
+
+#patient encounter success
+with open(r'H:\testauto\csv\new_patient_rego_opt\encounter_succ.csv', 'w', newline='') as f: 
+    writer = csv.writer(f)
+    writer.writerow([fields])
+    for patient in patient_encounter_success:
+        writer.writerow([patient.name,patient.surname, patient.DOB, patient.gender, patient.medicare, patient.address,patient.suburb, patient.post_code, patient.date, patient.error ])
+
+#patient encounter error
+with open(r'H:\testauto\csv\new_patient_rego_opt\encounter_err.csv', 'w', newline='') as f: 
+    writer = csv.writer(f)
+    writer.writerow([fields])
+    for patient in patient_encounter_error:
+        writer.writerow([patient.name,patient.surname, patient.DOB, patient.gender, patient.medicare, patient.address,patient.suburb, patient.post_code, patient.date, patient.error ])
+
+
+#prexisting patient
+with open(r'H:\testauto\csv\new_patient_rego_opt\prexisting.csv', 'w', newline='') as f: 
+    writer = csv.writer(f)
+    writer.writerow([fields])
+    for patient in prexisting:
+        writer.writerow([patient.name,patient.surname, patient.DOB, patient.gender, patient.medicare, patient.address,patient.suburb, patient.post_code, patient.date, patient.error ])
+
+print('Execution finished')

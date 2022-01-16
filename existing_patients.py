@@ -40,8 +40,8 @@ def automate():
 
             data_to_use[key]['error_code'] = ''
 
-            if key > 10: 
-                break
+            #if key > 10: 
+                #break
 
             encounter_id = data_to_use[key]['encounter_id']
             encounter_date = data_to_use[key]['LAST_IN_x'][0:10]
@@ -114,7 +114,7 @@ def automate():
             elif random_hour < 12:
                 encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
 
-            times.sleep(5)
+            times.sleep(1)
             save_button = driver.find_element_by_class_name('btn.btn-dark')
 
             try:
