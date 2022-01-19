@@ -28,7 +28,15 @@ prexisting = []
 
 print("Hey you are running the new patients script")
 #import the new patient data
-new_patient_data = spread.new_patients
+#############################
+### below is where we     ###
+### interact with diff    ###
+### data sources. Needs   ###
+### to be fixed           ###
+#############################
+
+#new_patient_data = spread.new_patients
+new_patient_data = spread.no_medicare_df
 
 
 def add_encounter(patient_obj, driver):
@@ -64,6 +72,8 @@ def add_encounter(patient_obj, driver):
             symptom_to_click = array_of_symptoms[randome_index]
             if symptom_to_click.is_selected() == False:
                 symptom_to_click.click()
+            else:
+                continue
 
             counter += 1
 
@@ -92,13 +102,19 @@ def add_encounter(patient_obj, driver):
 
             times.sleep(2)
             save_button = driver.find_element_by_class_name('btn.btn-dark')
-
-            
             save_button.click()
-            WebDriverWait(driver,timeout=3).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
-            #any errors are caught in the check patient function. 
-            print('encounter added')
-            return
+
+            try:
+                url = driver.current_url
+                assert url == 'https://app.respiratoryclinic.com.au/dashboard/'
+                print('encounter success')
+                patient_encounter_success.append(patient_obj)
+                return
+
+            except Exception as e:
+                print('encounter not added')
+                patient_encounter_error.append(patient_obj)
+                return
 
     except Exception as e: 
         print("Encounter not added")
@@ -161,12 +177,12 @@ def check_patient_exists(patient_object, driver):
                 try:
                     add_encounter(patient_object, driver)
                    
-                    patient_encounter_success.append(patient_object)
+                    #patient_encounter_success.append(patient_object)
                     return True
 
                 except Exception as e:
                     patient_object.error = e 
-                    patient_encounter_error.append(patient_object)
+                    #patient_encounter_error.append(patient_object)
                     return True
                     
                     

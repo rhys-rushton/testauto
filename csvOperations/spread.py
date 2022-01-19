@@ -107,3 +107,7 @@ no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
 new_patients = (new_patients.transpose()).to_dict()
 #print(new_patients[0]['LAST_IN_x'][0:10])
 existing_patients = (prexisting_df.transpose()).to_dict()
+
+no_medicare_df = (no_medicare_df.transpose()).to_dict()
+
+rhino_data_dup_check = (rhino_data.transpose()).to_dict()

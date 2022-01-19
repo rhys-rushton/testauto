@@ -117,9 +117,13 @@ def automate():
             times.sleep(1)
             save_button = driver.find_element_by_class_name('btn.btn-dark')
 
+            save_button.click()
+            times.sleep(1)
+
+            url = driver.current_url
+
             try:
-                save_button.click()
-                WebDriverWait(driver,timeout=2).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
+                assert url == 'https://app.respiratoryclinic.com.au/dashboard/'
                 print("patient success")
                 encounter_success.append(data_to_use[key])
                 continue

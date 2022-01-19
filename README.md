@@ -55,12 +55,16 @@ https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value
 This is the automation script for registering new patients. 
 
 # Things to automate
-3000-> new registration
-2000-> encounters
-3000 -> follow up. 
-2000 -> booster 
-500 -> check for medicare against rhino data and put those that are not in rhino into respiratory clinic app. put those that are in rhino app into prexisting. 
-500 -> patients who are duplicates
+Registering New Tests Patients Automation - $3000
+Patient Test Encounters	 - $2000
+List of Patients without Medicare Number - $500
+Duplicates in Test Patients - $500
+Follow up for COVID tests - $3000
+
+
+$2000 -> COVID Booster
+$500 -> Duplicate vaccination patients
+
 
 
 empty addreses for new pateients
