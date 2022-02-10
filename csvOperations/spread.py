@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+from random import randint, random
 import pandas as pd
 
 #we do the following here:
@@ -111,3 +113,12 @@ existing_patients = (prexisting_df.transpose()).to_dict()
 no_medicare_df = (no_medicare_df.transpose()).to_dict()
 
 rhino_data_dup_check = (rhino_data.transpose()).to_dict()
+
+add_follow_ups = input('Do you want to add followups? ')
+if add_follow_ups == 'Yes':
+       date_start = datetime.strptime(input('Please enter a date range'), '%d/%m/%Y')
+       for date in rhino_data['encounter_date']:
+              if datetime.strptime(date, '%d/%m/%Y') > date_start and datetime.strptime(date, '%d/%m/%Y') <= datetime.today() - timedelta(days = 3):
+                     print(date)
+
+
