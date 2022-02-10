@@ -14,11 +14,4 @@ from auto_funcs.login import login
 from auto_funcs.symptoms import symptoms
 
 
-driver = login()
-surname = 'Doe'
-(driver.find_element_by_link_text('Existing Assessment Patients')).click()
-(driver.find_element_by_id('lastName').send_keys(surname))
-search_button = driver.find_element_by_class_name('btn.btn-dark')
-search_button.click()
-assert driver.find_element_by_xpath("//*[contains(text(), 'Potential Duplicate found')]").is_displayed()
-
+#just testing

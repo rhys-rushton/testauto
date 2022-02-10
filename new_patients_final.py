@@ -121,19 +121,9 @@ def add_encounter(patient_obj, driver):
         print(e)
         times.sleep(2)
         return 
-            
-         
-
-        
-            
-            
-
-
 
 
 def check_patient_exists(patient_object, driver):
-    
-
     #needs to return true or false if patient exists.
     exisiting_patient_button = driver.find_element_by_link_text("Existing Assessment Patients")
     exisiting_patient_button.click()
@@ -150,7 +140,6 @@ def check_patient_exists(patient_object, driver):
         driver.get("https://app.respiratoryclinic.com.au/dashboard/")
         return False
     except:
-
         #want to check if their DOB is there
         date_of_birth = remove_zeroes(patient_object.DOB)
         date_of_birth_present = look_for_date(date_of_birth, driver)
@@ -184,13 +173,12 @@ def check_patient_exists(patient_object, driver):
                     patient_object.error = e 
                     #patient_encounter_error.append(patient_object)
                     return True
-                    
-                    
-
         else:
             #patient doesn't exist. 
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
             return False
+
+
 
 
 def register_patient(patient_obj, driver):

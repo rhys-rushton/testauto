@@ -37,7 +37,7 @@ dsp_and_redrc_df.drop(['CLINIC_CODE_x', 'TITLE_x','MAILING_ADDRESS_LINE_1_x',
        'PRACTICE_DEFINABLE_FIELD9', 'PRACTICE_DEFINABLE_FIELD10', 'FIRST_IN',
        'LAST_IN_y', 'ALERTS', 'CLINIC_CODE_y', 'MAILING_SUBURB_TOWN_y', 'MAILING_POSTCODE_y', 'FAMILY_ID','VETERAN_AFFAIRS_NUMBER',
        'VETERAN_FILE_NUMBER_EXPIRY_DATE', 'PATIENT_HEALTH_CARE_CARD',
-       'PATIENT_HLTH_CARE_CARD_EX_DATE', 'SAFETY_NET_NO'  ], axis = 1, inplace=True)
+       'PATIENT_HLTH_CARE_CARD_EX_DATE', 'SAFETY_NET_NO'], axis = 1, inplace=True)
 
 #we want to remove this eventually but currently it is being used in the web scraping part. 
 dsp_and_redrc_df = (dsp_and_redrc_df.transpose()).to_dict()
@@ -84,7 +84,7 @@ prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUM
 
 #remove duplicates as we are matching based on medicare so we can drop based on file number
 #we want to get the most recent version though so that we can update the encounter. 
-prexisting_df.drop_duplicates(subset=['FILE_NUMBER'],keep='last', inplace=True)
+prexisting_df.drop_duplicates(subset=['FILE_NUMBER', 'LAST_IN_x'],keep='last', inplace=True)
 
 #all the patients we couldn't find are in 'new_patients'
 #all the patients that were already in the rhino app go into 'prexistng_df'. 
