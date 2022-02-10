@@ -24,15 +24,6 @@ class Patient():
         self.diagnosis = diagnosis
         self.outcome = outcome
 
-
-
-
-
-
-
-
-
-
 #basic testing class
 class patient():
     def __init__(self, name, surname, DOB, gender,medicare, address, suburb, post_code, date, error=''):
@@ -48,3 +39,13 @@ class patient():
         self.error = error
 
 
+#follow up class
+class patient_follow_up():
+    def __init__(self, name, surname, DOB, encounter_id, encounter_date, outcome = ''):
+        self.name = name 
+        self.surname = surname
+        self.DOB = DOB
+        self.encounter_id = encounter_id
+        self.encounter_date = encounter_date
+        self.outcome = outcome 
+        
