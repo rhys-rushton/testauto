@@ -6,10 +6,11 @@ This script can automate the registering of patients who have been tested, the u
 a negative result. This script will also pick up on any patients who may be duplicates. 
 
 ## Table of Contents 
-- [How to Run and Install] How to Run and Install
-- How to use
-- Dependencies
-- Checking for duplicates
+- [How to Run and Install](#how-to-run-and-install)
+- [How to Run and Install](#checking-for-duplicates)
+- [Follow-ups](#follow-ups)
+- [Registering patients and new encounters](#registering-patients-and-adding-encounters)
+- [Dependencies](#dependencies)
 
 ## How to Run and Install
 This autmation tool requires you to have [Python](https://www.python.org/) installed. You will also need a wedriver for whatever browser it is that you are using. 
