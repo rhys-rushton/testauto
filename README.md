@@ -6,7 +6,7 @@ This script can automate the registering of patients who have been tested, the u
 a negative result. This script will also pick up on any patients who may be duplicates. 
 
 ## Table of Contents 
-- How to run and install
+- [How to Run and Install] How to Run and Install
 - How to use
 - Dependencies
 - Checking for duplicates
