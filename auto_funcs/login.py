@@ -3,12 +3,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import getpass
 
 def login():
     driver = webdriver.Chrome(executable_path=r'C:\Users\RRushton\Desktop\chromedriver.exe')
     time.sleep(2)
-    em = input("enter email please ")
-    pw = input("enter pword")
+    em = getpass.getpass('Email:')
+    pw = getpass.getpass('Password:')
     
     driver.get("https://app.respiratoryclinic.com.au/login")
     userName = driver.find_element_by_id("inputUsername")

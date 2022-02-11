@@ -1,25 +1,42 @@
 # Automation Tool for Uploading Vaccination Data for COVID-19 (AUSTRALIA)
 This is a python cli application that enables users to automate the uploading of data to the Australian Government's Respiratory Clinic app. 
 In order to use this app. you will need to be a registered user on the government respiratory clinic app. and you will also need access to the relevant patient
-management system for sourcing data. The two data sources I have been using is Aspen Medical's Rhino app and Zedmed. If you are using other data sources you will 
-need to do your own data cleaning but you can use my work for reference (see ./csvOperations). 
-The web automated code should be reusable for anyone, however if the government makes any changes to the id codes for webelements then the app will break, however these errors
-will be caught and documented. 
+management system for sourcing data. The two data sources I have been using is Aspen Medical's Rhino app and Zedmed. 
+This script can automate the registering of patients who have been tested, the uploading of their pcr test encounter and also the follow up for those patients who received
+a negative result. This script will also pick up on any patients who may be duplicates. 
 
+## Table of Contents 
+- How to run and install
+- How to use
+- Dependencies
+- Checkinf for duplicates
 
-# Table of Contents 
+## How to Run and Install
+This autmation tool requires you to have [Python](https://www.python.org/) installed. You will also need a wedriver for whatever browser it is that you are using. 
+You will also need to install some dependenices. 
 
-# How to Run and Install
+```sh
+pip install pandas
+pip install selenium
+```
+The inputs and outputs are configured to be specific to a certain computer, these will need to be changed if you move location. 
 
-# How to Use
+The data inputs for uploading patient tests encounters and registering goes in the 'csvOperations' folder. The data outputs  go in the 'csv' folder.
+Further, the data outputs for the follow up process go in the 'follow_up_output' folder. 
 
-# Credits
+All csv files are never uploaded to github because of data sensitivity. 
 
-# Lisence 
+#### Checking for Duplicates 
 
-# Badges
+Make sure that you have the correct data source available for the script. The script you will need is the aspen medical record of all of the tests. 
 
-# Tests 
+![Alt Text](gifs\duplicates.gif)
+
+## Dependencies
+- Python
+- Selenium
+- Pandas
+- Driver for whatever browser you're using
 
 
 
@@ -51,22 +68,3 @@ https://stackoverflow.com/questions/37113173/compare-2-excel-files-using-python
 https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value-of-a-dataframe-is-ambiguous-use-a-empty-a-bool
 
 
-
-This is the automation script for registering new patients. 
-
-# Things to automate
-Registering New Tests Patients Automation - $3000
-Patient Test Encounters	 - $2000
-List of Patients without Medicare Number - $500
-Duplicates in Test Patients - $500
-Follow up for COVID tests - $3000
-
-
-$2000 -> COVID Booster
-$500 -> Duplicate vaccination patients
-
-
-
-empty addreses for new pateients
-postcodes for new patients
-empty medicare numbers new patients
