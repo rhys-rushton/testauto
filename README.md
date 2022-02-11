@@ -9,7 +9,7 @@ a negative result. This script will also pick up on any patients who may be dupl
 - How to run and install
 - How to use
 - Dependencies
-- Checkinf for duplicates
+- Checking for duplicates
 
 ## How to Run and Install
 This autmation tool requires you to have [Python](https://www.python.org/) installed. You will also need a wedriver for whatever browser it is that you are using. 
@@ -32,39 +32,37 @@ Make sure that you have the correct data source available for the script. The sc
 
 ![Checking for Duplicates](duplicates.gif)
 
+The above gif is instructive for all other proccesses that need to be run, so I will only give the relevant commands for further processes. The password and email will not be shown on the CLI and I couldn't demo uploading data as this is 
+sensitive. But once you have put in your 2FA code the script will run. 
+
+#### Follow-ups
+
+```sh
+python follow_up.py
+```
+Then enter your email and password. 
+On completion the results of the script will be outputed in the 'follow_up_output' folder.  
+
+#### Registering patients and adding encounters. 
+It is important to note that there are two scripts here. One script is for patients who have been tests before, whereas the other script is for new patients. 
+To run the script for new patients:
+
+```sh
+python new_patients_final.py
+```
+For existing patients: 
+
+```sh
+python existing_patients.py
+```
+
+The process for username and password is the same as the gif above. Output of this process can be found in the 'csv' folder. 
+
 ## Dependencies
 - Python
 - Selenium
 - Pandas
 - Driver for whatever browser you're using
 
-
-
-CSV Module Python 
-https://docs.python.org/3/library/csv.html
-
-Selenium 
-https://selenium-python.readthedocs.io/installation.html
-
-
-# A rough working outline of how the project will work. 
-The script starts. 
-The script loads the excel data and gets it ready to go. 
-Username information is entered
-The script logs me in 
-the script waits for me to enter authenticator password. 
-The script then logs me in to the main page. 
-The script then commences uploading the data. 
-It checks whether or not the patient is existing. If the patient exists it executes that work flow. 
-If the patient doesn't exist then it executes the other work flow. 
-
-things to match are DOB, GENDER
-
-https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas
-https://stackoverflow.com/questions/24870953/does-pandas-iterrows-have-performance-issues
-https://pandas.pydata.org/pandas-docs/stable/user_guide/basics.html#essential-basic-functionality
-https://stackoverflow.com/questions/37113173/compare-2-excel-files-using-python
-
-https://datascience.stackexchange.com/questions/58546/valueerror-the-truth-value-of-a-dataframe-is-ambiguous-use-a-empty-a-bool
 
 
