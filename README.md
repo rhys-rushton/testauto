@@ -30,6 +30,11 @@ All csv files are never uploaded to github because of data sensitivity.
 
 Make sure that you have the correct data source available for the script. The script you will need is the aspen medical record of all of the tests. 
 
+```sh
+python find_duplicates.py
+```
+Enter your emaila nd 2FA code and then the script will run. 
+
 ![Checking for Duplicates](duplicates.gif)
 
 The above gif is instructive for all other proccesses that need to be run, so I will only give the relevant commands for further processes. The password and email will not be shown on the CLI and I couldn't demo uploading data as this is 
