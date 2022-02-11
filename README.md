@@ -7,7 +7,7 @@ a negative result. This script will also pick up on any patients who may be dupl
 
 ## Table of Contents 
 - [How to Run and Install](#how-to-run-and-install)
-- [How to Run and Install](#checking-for-duplicates)
+- [Checking for duplicates](#checking-for-duplicates)
 - [Follow-ups](#follow-ups)
 - [Registering patients and new encounters](#registering-patients-and-adding-encounters)
 - [Dependencies](#dependencies)
