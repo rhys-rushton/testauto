@@ -51,7 +51,7 @@ def main ():
             print('No duplicate')
 
 main()
-
+print('duplicates done')
 #write errors to csv
 with open(r'H:\testauto\csv\test_duplicates\test_duplicates.csv', 'w', newline='') as f:
     writer = csv.DictWriter(f, fieldnames=field_data, extrasaction='ignore')

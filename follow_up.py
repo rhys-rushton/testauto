@@ -150,7 +150,7 @@ def main ():
 
 
 main()
-
+print('Follow ups done.')
 
 #fields for the csv
 fields = ['name', 'surname', 'DOB', 'encounter_id', 'encounter_date', 'outcome']
