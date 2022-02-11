@@ -30,7 +30,7 @@ All csv files are never uploaded to github because of data sensitivity.
 
 Make sure that you have the correct data source available for the script. The script you will need is the aspen medical record of all of the tests. 
 
-![Checking for Duplicates](https://watch.screencastify.com/v/wNXxGPwbXaspCkUBdVsj)
+![Checking for Duplicates](.\gifs\duplicates.gif)
 
 ## Dependencies
 - Python
