@@ -51,10 +51,12 @@ def add_follow_up(driver, patient_object):
         sms_check.click()
 
         #Save the follow up encounter. 
-        #save_button = driver.find_element_by_class_name('btn.btn-dark')
-        #save_button.click()
+        save_button = driver.find_element_by_class_name('btn.btn-dark')
+        save_button.click()
+        follow_up_done.append(patient_object)
+        print('Follow up added')
 
-        time.sleep(1)
+        time.sleep(0.25)
     except Exception as e: 
         #print(e)
         #print(traceback.format_exc())
@@ -93,7 +95,7 @@ def find_encounter(driver, encounter_date, patient_object):
         try:
             assert encounter_date in encounter.get_attribute('innerHTML')
             driver.find_element_by_link_text('Edit encounter').click()
-            time.sleep(1)
+            time.sleep(0.25)
 
             #check if follow up is there. 
             check_follow_up(driver, patient_object)
@@ -115,7 +117,7 @@ def look_up_patient(driver, patient_object):
     search_button = driver.find_element_by_class_name('btn.btn-dark')
     search_button.click()
 
-    time.sleep(1)
+    time.sleep(0.25)
     encounter_date = remove_zeroes(patient_object.encounter_date)
     find_encounter(driver, encounter_date, patient_object)
 
@@ -125,8 +127,8 @@ def main ():
     driver = login()
 
     for key in data_to_use:
-        if key > 10:
-            break
+        #if key > 20:
+            #break
         try: 
             driver.get("https://app.respiratoryclinic.com.au/dashboard/")
             WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
@@ -141,7 +143,7 @@ def main ():
             look_up_patient(driver, patient_obj)
 
             patient_obj.outcome = 'success'
-            follow_up_done.append(patient_obj)
+            #follow_up_done.append(patient_obj)
 
         except Exception as e:
             patient_obj.outcome = e

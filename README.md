@@ -1,4 +1,4 @@
-# Automation Tool for Uploading Vaccination Data for COVID-19 (AUSTRALIA)
+# Automation Tool for Uploading PCR-Testing Data for COVID-19 (AUSTRALIA)
 This is a python cli application that enables users to automate the uploading of data to the Australian Government's Respiratory Clinic app. 
 In order to use this app. you will need to be a registered user on the government respiratory clinic app. and you will also need access to the relevant patient
 management system for sourcing data. The two data sources I have been using is Aspen Medical's Rhino app and Zedmed. 

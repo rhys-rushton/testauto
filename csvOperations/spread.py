@@ -83,6 +83,9 @@ new_patients = new_patients[new_patients['_merge'] == 'left_only']
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
 #print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
 
+#this variable is used in the encounter check file. 
+prexisting_df_copy = prexisting_df
+
 
 #remove duplicates as we are matching based on medicare so we can drop based on file number
 #we want to get the most recent version though so that we can update the encounter. 
@@ -123,11 +126,13 @@ add_follow_ups = input('Do you want to add followups? ')
 if add_follow_ups == 'Yes':
        rhino_dict = (rhino_data.transpose()).to_dict()
        
-
-       date_start = datetime.strptime(input('Please enter a date range'), '%d/%m/%Y')
+       
+       date_start = datetime.strptime(input('Please enter a start date'), '%d/%m/%Y')
+       date_end = datetime.strptime(input('Please enter an end date'), '%d/%m/%Y')
+       #datetime.today() - timedelta(days = 4)
        count = 0
        for key in rhino_dict:
-              if datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') > date_start and datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') <= datetime.today() - timedelta(days = 4):
+              if datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') > date_start and datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') <= date_end:
                      #print(rhino_dict[key]['encounter_date'])
                      rhino_follow_up_dict[count] = rhino_dict[key]
                      count += 1
