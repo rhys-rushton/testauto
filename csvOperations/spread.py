@@ -1,3 +1,4 @@
+from audioop import add
 from datetime import datetime, timedelta
 from random import randint, random
 import pandas as pd
@@ -136,6 +137,9 @@ if add_follow_ups == 'Yes':
                      #print(rhino_dict[key]['encounter_date'])
                      rhino_follow_up_dict[count] = rhino_dict[key]
                      count += 1
+
+elif add_follow_ups != 'Yes':
+       print("You don't have any data for follow ups")
 
 
 
