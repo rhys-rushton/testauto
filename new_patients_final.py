@@ -34,9 +34,9 @@ print("Hey you are running the new patients script")
 ### data sources. Needs   ###
 ### to be fixed           ###
 #############################
-
-#new_patient_data = spread.new_patients
-new_patient_data = spread.no_medicare_df
+print("HEY YOU NEED TO DO BOTH NEW PATIENTS AND PATIENTS W/OUT MEDICARE")
+new_patient_data = spread.new_patients
+#new_patient_data = spread.no_medicare_df
 
 
 def add_encounter(patient_obj, driver):
@@ -284,6 +284,8 @@ def register_patient(patient_obj, driver):
         save_button = driver.find_element_by_class_name('btn.btn-dark')
         save_button.click()
 
+        #times.sleep(2)
+
         url = driver.current_url
 
         if url == 'https://app.respiratoryclinic.com.au/dashboard/':
@@ -355,6 +357,7 @@ def new_patient_main():
             continue
         elif patient_exists == True: 
             print('Patient Exists')
+            #times.sleep(5)
             continue
 
 new_patient_main()

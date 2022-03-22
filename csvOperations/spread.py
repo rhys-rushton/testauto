@@ -1,6 +1,7 @@
 from audioop import add
 from datetime import datetime, timedelta
 from random import randint, random
+from numpy import int64
 import pandas as pd
 
 #we do the following here:
@@ -9,10 +10,14 @@ import pandas as pd
 #we then merge this data together based on the patients filenumber. We do this to get their medicare number which we will need later. 
 item_number_data = pd.read_csv(r'H:\testauto\csvOperations\item_number\REDRC.csv', header=0, encoding='CP1252')
 dsp_data = pd.read_csv(r'H:\testauto\csvOperations\dsp\DSPatients.csv', header=0, encoding='CP1252')
-
+#dsp_data.FILE_NUMBER.astype(int)
+#print(item_number_data.info())
+#print(dsp_data.info())
 #contains all those who have same file number
 #aim here is to get medicare number so we can compare this to rhino
 dsp_and_redrc_df = pd.merge(item_number_data, dsp_data, on= 'FILE_NUMBER', how = 'inner')
+print(dsp_and_redrc_df['MEDICARE_NUMBER'])
+
 #change format so that we don't have decimals for medicare
 dsp_and_redrc_df.fillna('', inplace=True)
 pd.set_option('display.float_format', lambda x: '%.0f' % x)
@@ -44,6 +49,7 @@ dsp_and_redrc_df.drop(['CLINIC_CODE_x', 'TITLE_x','MAILING_ADDRESS_LINE_1_x',
 
 #we want to remove this eventually but currently it is being used in the web scraping part. 
 dsp_and_redrc_df = (dsp_and_redrc_df.transpose()).to_dict()
+
 
 
 #get the rhino data and clean it all. 
@@ -82,7 +88,8 @@ dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBE
 new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'], indicator=True)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
-#print(prexisting_df[['encounter_id', 'GIVEN_NAME_x', 'FAMILY_NAME_x']])
+print(new_patients.size)
+print(prexisting_df.size)
 
 #this variable is used in the encounter check file. 
 prexisting_df_copy = prexisting_df
@@ -111,8 +118,11 @@ no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
 #print(prexisting_df['LAST_IN_x'][0:10])
 
 new_patients = (new_patients.transpose()).to_dict()
+print(len(new_patients))
+
 #print(new_patients[0]['LAST_IN_x'][0:10])
 existing_patients = (prexisting_df.transpose()).to_dict()
+print(len(existing_patients))
 
 no_medicare_df = (no_medicare_df.transpose()).to_dict()
 
@@ -123,7 +133,7 @@ rhino_data_dup_check = (rhino_data.transpose()).to_dict()
 ################Follow ups
 
 rhino_follow_up_dict = {}
-add_follow_ups = input('Do you want to add followups? ')
+add_follow_ups = input('Do you want to add followups? "Yes" or "No"')
 if add_follow_ups == 'Yes':
        rhino_dict = (rhino_data.transpose()).to_dict()
        
