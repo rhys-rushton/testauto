@@ -16,7 +16,7 @@ dsp_data = pd.read_csv(r'H:\testauto\csvOperations\dsp\DSPatients.csv', header=0
 #contains all those who have same file number
 #aim here is to get medicare number so we can compare this to rhino
 dsp_and_redrc_df = pd.merge(item_number_data, dsp_data, on= 'FILE_NUMBER', how = 'inner')
-print(dsp_and_redrc_df['MEDICARE_NUMBER'])
+
 
 #change format so that we don't have decimals for medicare
 dsp_and_redrc_df.fillna('', inplace=True)
@@ -86,10 +86,12 @@ dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBE
 #this is becuase we strip out the identification number from the dsp_and_and_redrc_copy dataframe. 
 #if we don't merge with an individualising parameter (i.e. DOB) then what happens is that it will overwrite column values for anyone who shares a medicare card (i.e. families)
 new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'], indicator=True)
+print(new_patients)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
+print(new_patients.size)
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
 #print(new_patients.size)
-#print(prexisting_df.size)
+print(prexisting_df.size)
 
 #this variable is used in the encounter check file. 
 prexisting_df_copy = prexisting_df
@@ -106,11 +108,13 @@ prexisting_df.drop_duplicates(subset=['FILE_NUMBER', 'LAST_IN_x'],keep='last', i
 # get all patients without medicare 
 no_medicare_df = new_patients[new_patients['MEDICARE_NUMBER'] == '']
 
-# get all patients without medicare numbers removed from new_patient data. 
-new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
+##########
+# YOU MAY NEED TO CHANGE THE BELOW #
 
-print(new_patients)
-print(prexisting_df)
+# get all patients without medicare numbers removed from new_patient data. 
+#new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
+
+
 #print(no_medicare_df.shape[0])
 #print(prexisting_df.shape[0])
 #print(new_patients.shape[0])
@@ -123,8 +127,10 @@ print(len(no_medicare_df))
 new_patients = (new_patients.transpose()).to_dict()
 print(len(new_patients))
 
+
 #print(new_patients[0]['LAST_IN_x'][0:10])
 existing_patients = (prexisting_df.transpose()).to_dict()
+print('This is prexisitng')
 print(len(existing_patients))
 
 no_medicare_df = (no_medicare_df.transpose()).to_dict()

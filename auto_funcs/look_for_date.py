@@ -27,7 +27,7 @@ def find_date_click (date_string, driver):
             assert date_string in div.get_attribute('innerHTML')
             print("We here" )
             print(div.get_attribute('innerHTML'))
-            time.sleep(20)
+            #time.sleep(20)
             
             new_encounter_button = div.find_element_by_class_name('btn.btn-primary.mr-4')
             new_encounter_button.click()
