@@ -145,7 +145,7 @@ def automate():
 
 automate()
 print('Exisitng patients done.')
-
+times.sleep(10)
 
 #write errors to csv
 with open(r'H:\testauto\csv\existing_patients_output\existing_encounter_err.csv', 'w', newline='') as f:

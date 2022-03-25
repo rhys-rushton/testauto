@@ -88,8 +88,8 @@ dsp_and_redrc_df_copy['MEDICARE_NUMBER'] = dsp_and_redrc_df_copy['MEDICARE_NUMBE
 new_patients = dsp_and_redrc_df_copy.merge(rhino_data, how='outer', left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'], indicator=True)
 new_patients = new_patients[new_patients['_merge'] == 'left_only']
 prexisting_df = dsp_and_redrc_df_copy.merge(rhino_data, left_on = ['MEDICARE_NUMBER', 'DATE_OF_BIRTH'], right_on=['medicare_number', 'date_of_birth'])
-print(new_patients.size)
-print(prexisting_df.size)
+#print(new_patients.size)
+#print(prexisting_df.size)
 
 #this variable is used in the encounter check file. 
 prexisting_df_copy = prexisting_df
@@ -109,6 +109,8 @@ no_medicare_df = new_patients[new_patients['MEDICARE_NUMBER'] == '']
 # get all patients without medicare numbers removed from new_patient data. 
 new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
 
+print(new_patients)
+print(prexisting_df)
 #print(no_medicare_df.shape[0])
 #print(prexisting_df.shape[0])
 #print(new_patients.shape[0])
@@ -116,6 +118,7 @@ new_patients = new_patients[new_patients['MEDICARE_NUMBER']  != '']
 #write the patients with no medicare to csv file. 
 no_medicare_df.to_csv(r'H:\testauto\csv\no_medicare.csv')
 #print(prexisting_df['LAST_IN_x'][0:10])
+print(len(no_medicare_df))
 
 new_patients = (new_patients.transpose()).to_dict()
 print(len(new_patients))

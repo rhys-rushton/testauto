@@ -1,5 +1,6 @@
 # this function looks for either the encounter date or the patient's date of birth 
 # so that we can avoid duplicate encounters. 
+import time
 def look_for_date (date_string, driver):
     print('looking for date')
     date_present = False
@@ -7,6 +8,7 @@ def look_for_date (date_string, driver):
         try: 
             assert date_string in div.get_attribute('innerHTML')
             date_present = True
+            print(div.get_attribute('innerHTML'))
             break
             
         except:
@@ -23,12 +25,15 @@ def find_date_click (date_string, driver):
     for div in driver.find_elements_by_class_name('card.my-4.patient-card.assessment-reg-patient'):
         try: 
             assert date_string in div.get_attribute('innerHTML')
-            new_encounter_button = driver.find_element_by_link_text("New Encounter")
+            print("We here" )
+            print(div.get_attribute('innerHTML'))
+            time.sleep(20)
+            
+            new_encounter_button = div.find_element_by_class_name('btn.btn-primary.mr-4')
             new_encounter_button.click()
             return
             
         except:
             continue
-    
 
 
