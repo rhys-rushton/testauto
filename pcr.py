@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 import time as times
-from csvOperations import csv_test
+from csvOperations import pcr_data
 import csv
 from random import randrange
 from auto_funcs.date_string_zeroes import remove_zeroes
@@ -16,7 +16,6 @@ from auto_funcs.symptoms import symptoms
 from csvOperations.fields import fields as field_data
 from auto_funcs.look_for_date import look_for_date, find_date_click
 import traceback
-
 
 fields = field_data
 
@@ -27,18 +26,9 @@ patient_registration_error = []
 patient_encounter_error = []
 prexisting = []
 
+print("Hey you are uploading new patients")
+new_patient_data = pcr_data.merged_data_pcr
 
-print("Hey you are running the new patients script")
-#import the new patient data
-#############################
-### below is where we     ###
-### interact with diff    ###
-### data sources. Needs   ###
-### to be fixed           ###
-#############################
-print("HEY YOU NEED TO DO BOTH NEW PATIENTS AND PATIENTS W/OUT MEDICARE")
-new_patient_data = csv_test.merged_data_pcr
-#new_patient_data = spread.no_medicare_df
 
 
 def add_encounter(patient_obj, driver):
@@ -74,8 +64,8 @@ def add_encounter(patient_obj, driver):
             symptom_to_click = array_of_symptoms[randome_index]
             if symptom_to_click.is_selected() == False:
                 symptom_to_click.click()
-            else:
-                continue
+            #else:
+                #continue
 
             counter += 1
         print('symps done')
@@ -230,6 +220,8 @@ def register_patient(patient_obj, driver):
             gender_field.select_by_visible_text('Male')
         elif patient_obj.gender == 'F':
             gender_field.select_by_visible_text('Female')
+        else:
+            gender_field.select_by_visible_text('Not Stated')
 
         atsi_field = Select(driver.find_element_by_id('patient_indigenousStatus'))
         atsi_field.select_by_visible_text('Not stated')
@@ -238,6 +230,9 @@ def register_patient(patient_obj, driver):
         medicare_field = Select(driver.find_element_by_id('patient_typeOfIdProvided'))
         if patient_obj.medicare == '':
             medicare_field.select_by_visible_text('No - Other ID sighted')
+        elif patient_obj.medicare == 'nan':
+            medicare_field.select_by_visible_text('No - Other ID sighted')
+
         elif patient_obj.medicare != '': 
             medicare_field.select_by_visible_text('Yes - Please enter Medicare Card number')
             patient_medicare_num = driver.find_element_by_id('patient_medicareNumber')
