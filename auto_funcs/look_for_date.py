@@ -5,14 +5,14 @@ def look_for_date (date_string, driver):
     print('looking for date')
     date_present = False
     for div in driver.find_elements_by_class_name('card.my-4.patient-card.assessment-reg-patient'):
-        try: 
-            assert date_string in div.get_attribute('innerHTML')
+        
+        if date_string in div.get_attribute('innerHTML'):
+            print('date here')
             date_present = True
-            print(div.get_attribute('innerHTML'))
+            #print(div.get_attribute('innerHTML'))
             break
-            
-        except:
-            continue
+                
+       
     
     return date_present
 
@@ -25,15 +25,18 @@ def find_date_click (date_string, driver):
     for div in driver.find_elements_by_class_name('card.my-4.patient-card.assessment-reg-patient'):
         try: 
             assert date_string in div.get_attribute('innerHTML')
-            print("We here" )
-            print(div.get_attribute('innerHTML'))
+            #print("We here" )
+            #print(div.get_attribute('innerHTML'))
             #time.sleep(20)
             
             new_encounter_button = div.find_element_by_class_name('btn.btn-primary.mr-4')
             new_encounter_button.click()
-            return
+            break
+            
             
         except:
+            print('we still running find_date_click')
             continue
+    return
 
 

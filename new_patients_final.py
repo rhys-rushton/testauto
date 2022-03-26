@@ -1,11 +1,13 @@
+from msilib.schema import Error
 from classes import patientClass
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 import time as times
-from csvOperations import spread
+from csvOperations import csv_test
 import csv
 from random import randrange
 from auto_funcs.date_string_zeroes import remove_zeroes
@@ -35,7 +37,7 @@ print("Hey you are running the new patients script")
 ### to be fixed           ###
 #############################
 print("HEY YOU NEED TO DO BOTH NEW PATIENTS AND PATIENTS W/OUT MEDICARE")
-new_patient_data = spread.new_patients
+new_patient_data = csv_test.merged_data_pcr
 #new_patient_data = spread.no_medicare_df
 
 
@@ -76,45 +78,56 @@ def add_encounter(patient_obj, driver):
                 continue
 
             counter += 1
+        print('symps done')
 
-            no_usual_meds = driver.find_element_by_id('no_usual_medications')
-            no_usual_meds.click()
+        #times.sleep(30)
 
-            diagnosis = Select(driver.find_element_by_id('encounter_diagnosis_choice'))
+        no_usual_meds = driver.find_element_by_id('no_usual_medications')
+        no_usual_meds.click()
+        print('Usual meds done')
+        print(patient_obj)
+
+        WebDriverWait(driver,20).until(EC.visibility_of_all_elements_located((By.ID,'encounter_diagnosis_choice' )))
+        try:
+            diagnosis = Select(driver.find_element(By.ID, 'encounter_diagnosis_choice'))
             diagnosis.select_by_visible_text('Other (specify)')
+            WebDriverWait(driver,20).until(EC.visibility_of_all_elements_located((By.ID,'encounter_diagnosis_other' )))
             driver.find_element_by_id('encounter_diagnosis_other').send_keys('Possible covid')
+        except Exception as e: 
+            print(e)
+    
+        encounter_date = driver.find_element_by_id('encounter_encounterDate')
+        encounter_date.clear()
+        encounter_date.send_keys(patient_obj.date[0:10])
         
-            encounter_date = driver.find_element_by_id('encounter_encounterDate')
-            encounter_date.clear()
-            encounter_date.send_keys(patient_obj.date[0:10])
-            
-            random_hour = randrange(9, 19)
-            random_minute = randrange(59)
-            
-            encounter_time = driver.find_element_by_name('encounter_time')
-            encounter_time.clear()
+        random_hour = randrange(9, 19)
+        random_minute = randrange(59)
+        
+        encounter_time = driver.find_element_by_name('encounter_time')
+        encounter_time.clear()
 
-            if random_hour >= 12:
-                encounter_time.send_keys(f'{random_hour}:{random_minute}PM')
+        if random_hour >= 12:
+            encounter_time.send_keys(f'{random_hour}:{random_minute}PM')
 
-            elif random_hour < 12:
-                encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
+        elif random_hour < 12:
+            encounter_time.send_keys(f'{random_hour}:{random_minute}AM')
 
-            times.sleep(2)
-            save_button = driver.find_element_by_class_name('btn.btn-dark')
-            save_button.click()
+        #times.sleep(30)
+        save_button = driver.find_element_by_class_name('btn.btn-dark')
+        save_button.click()
+        #times.sleep(30)
 
-            try:
-                url = driver.current_url
-                assert url == 'https://app.respiratoryclinic.com.au/dashboard/'
-                print('encounter success')
-                patient_encounter_success.append(patient_obj)
-                return
+        try:
+            url = driver.current_url
+            assert url == 'https://app.respiratoryclinic.com.au/dashboard/'
+            print('encounter success')
+            patient_encounter_success.append(patient_obj)
+            return
 
-            except Exception as e:
-                print('encounter not added')
-                patient_encounter_error.append(patient_obj)
-                return
+        except Exception as e:
+            print('encounter not added')
+            patient_encounter_error.append(patient_obj)
+            return
 
     except Exception as e: 
         print("Encounter not added")
@@ -282,6 +295,7 @@ def register_patient(patient_obj, driver):
         driver.find_element_by_id('patient_reportConsent_yes').click()
 
         save_button = driver.find_element_by_class_name('btn.btn-dark')
+        #times.sleep(30)
         save_button.click()
 
         #times.sleep(2)
@@ -335,15 +349,15 @@ def new_patient_main():
         WebDriverWait(driver,timeout=5).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
 
         #get data for patient. 
-        given_name = new_patient_data[key]['GIVEN_NAME_x']   
-        surname = new_patient_data[key]['FAMILY_NAME_x']
+        given_name = new_patient_data[key]['GIVEN_NAME']   
+        surname = new_patient_data[key]['FAMILY_NAME']
         DOB = new_patient_data[key]['DATE_OF_BIRTH']
-        gender = new_patient_data[key]['GENDER_x']
-        medicare = new_patient_data[key]['MEDIRCARE_NUMBER_WREF']
-        adress_1 = new_patient_data[key]['HOME_ADDRESS_LINE_1_x'] 
-        suburb = new_patient_data[key]['HOME_SUBURB_TOWN_x']
-        postcode = new_patient_data[key]['HOME_POSTCODE_x']
-        encounter_date = new_patient_data[key]['LAST_IN_x'][0:10]
+        gender = new_patient_data[key]['GENDER']
+        medicare = new_patient_data[key]['MEDICARE_NUMBER']
+        adress_1 = new_patient_data[key]['HOME_ADDRESS_LINE_1'] 
+        suburb = new_patient_data[key]['HOME_SUBURB_TOWN']
+        postcode = new_patient_data[key]['HOME_POSTCODE']
+        encounter_date = new_patient_data[key]['ServDate'][0:10]
 
         patient_obj = patientClass.patient(given_name, surname, DOB, gender, medicare, adress_1, suburb, postcode, encounter_date)
 

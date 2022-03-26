@@ -1,5 +1,7 @@
+from heapq import merge
 from numpy import int64
 import pandas as pd
+pd.set_option('display.float_format', lambda x: '%.0f' % x)
 
 #change this to matts report
 red_rc = pd.read_csv(r'H:\testauto\csvOperations\item_number\REDRC.csv', header=0, encoding='CP1252')
@@ -11,21 +13,26 @@ dsp_patients.FILE_NUMBER = dsp_patients.FILE_NUMBER.astype(int)
 
 
 merged_data_pcr = pd.merge(red_rc, dsp_patients, on='FILE_NUMBER', how ='inner')
-merged_data_pcr.to_csv('test.csv', header=True)
+
 
 #drop any duplicates made in the merge based off FILE_NUMBER and ENCOUNTER_DATE
+merged_data_pcr = merged_data_pcr.drop_duplicates(subset=['FILE_NUMBER', 'ServDate'])
+
+#format the data in the dataframe so the program can use it properly.
+# I want to have empty fields in a standard format that I can send to the browser. 
+merged_data_pcr.fillna('')
+
+# I want to have the medicare number/ postocode as a string so I can slice easily and send to the browser. 
+merged_data_pcr.MEDICARE_NUMBER = merged_data_pcr.MEDICARE_NUMBER.astype(str)
+merged_data_pcr.HOME_POSTCODE = merged_data_pcr.HOME_POSTCODE.astype(str)
+print(merged_data_pcr)
+# remove whitepace in strings so I can index properly. 
+merged_data_pcr.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+merged_data_pcr.to_csv('test.csv', header=True)
+print(merged_data_pcr.dtypes)
+#turn data into a dictionary:
+merged_data_pcr = (merged_data_pcr.transpose()).to_dict()
 
 
-
-#use matt report:
-    #get file number
-    #get encounter date
-
-#from dsp get:
-    #first name 
-    #last name 
-    #etc
-
-#merge these two on file number. 
 
 #given_name, surname, DOB, gender, medicare, adress_1, suburb, postcode, encounter_date
