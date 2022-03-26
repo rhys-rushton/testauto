@@ -29,8 +29,6 @@ prexisting = []
 print("Hey you are uploading new patients")
 new_patient_data = pcr_data.merged_data_pcr
 
-
-
 def add_encounter(patient_obj, driver):
     try:
         WebDriverWait(driver,timeout=4).until(EC.url_contains("https://app.respiratoryclinic.com.au/dashboard/"))
@@ -44,8 +42,6 @@ def add_encounter(patient_obj, driver):
         times.sleep(2)
     
     try:
-
-
         fever_box = driver.find_element_by_id('encounter_symptoms_choice_Feverselfreported')
         cough_box = driver.find_element_by_id('encounter_symptoms_choice_Cough')
         sore_throat = driver.find_element_by_id('encounter_symptoms_choice_Sorethroat')
