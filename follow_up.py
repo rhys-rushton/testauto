@@ -23,7 +23,7 @@ no_follow_up_no_speciman = []
 follow_up_done = []
 #patient who has an error thrown, error code is appended to the patient object so we can troubleshoot if neccessary. 
 error = []
-
+number = 0
 
 #This functions adds the follow up. 
 def add_follow_up(driver, patient_object):
@@ -53,6 +53,7 @@ def add_follow_up(driver, patient_object):
         #Save the follow up encounter. 
         save_button = driver.find_element_by_class_name('btn.btn-dark')
         save_button.click()
+        number += 1
         follow_up_done.append(patient_object)
         print('Follow up added')
 
@@ -91,19 +92,24 @@ def find_encounter(driver, encounter_date, patient_object):
     print('Hey you are finding the encounter')
     #there could be mutliple encounters so we loop through the encounters and look for each one. 
     #we select the relevant encounter by matching by date. 
-    for encounter in driver.find_elements_by_class_name('list-group'):
-        try:
-            assert encounter_date in encounter.get_attribute('innerHTML')
-            driver.find_element_by_link_text('Edit encounter').click()
-            time.sleep(0.25)
+    for encounter in driver.find_elements_by_class_name('list-group-item.d-flex.w-100.justify-content-between.align-items-end'):
+        #print(encounter.get_attribute('innerHTML'))
+        if encounter_date in encounter.get_attribute('innerHTML'):
+            butoon = encounter.find_element_by_class_name('btn.btn-primary.my-2.mr-2')
+            butoon.click()
+            #time.sleep(10)
+        #try:
+            #assert encounter_date in encounter.get_attribute('innerHTML')
+            #driver.find_element_by_link_text('Edit encounter').click()
+            #time.sleep(10)
 
             #check if follow up is there. 
             check_follow_up(driver, patient_object)
 
 
-        except Exception as e:
-            print('error')
-            print(e)
+        #except Exception as e:
+            #print('error')
+            #print(e)
             
 #look the patient up. 
 def look_up_patient(driver, patient_object):
@@ -117,7 +123,7 @@ def look_up_patient(driver, patient_object):
     search_button = driver.find_element_by_class_name('btn.btn-dark')
     search_button.click()
 
-    time.sleep(0.25)
+    #time.sleep(10)
     encounter_date = remove_zeroes(patient_object.encounter_date)
     find_encounter(driver, encounter_date, patient_object)
 

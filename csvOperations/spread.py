@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from random import randint, random
 from numpy import int64
 import pandas as pd
-
+'''
 #we do the following here:
 #read the item_number_data from 'REDRC.csv'
 #read the data from 'DSPatients'
@@ -136,11 +136,12 @@ print(len(existing_patients))
 no_medicare_df = (no_medicare_df.transpose()).to_dict()
 
 rhino_data_dup_check = (rhino_data.transpose()).to_dict()
-
+'''
 
 
 ################Follow ups
-
+fields_for_rhino = ['encounter_date', 'encounter_time', 'encounter_id', 'first_name', 'last_name', 'date_of_birth', 'age_at_presentation', 'gender', 'medicare_number', 'indigenous_status', 'address_line1', 'suburb', 'state', 'postcode', 'emergency_contact_name', 'country_of_birth','home_language', 'patient_symptoms', 'usual_medications', 'specimen_collected', 'diagnosis', 'outcome']
+rhino_data = pd.read_csv(r'H:\testauto\csvOperations\rhinodata\rhinoapp.csv',dtype={'medicare_number': 'str'}, header=0, usecols= fields_for_rhino)
 rhino_follow_up_dict = {}
 add_follow_ups = input('Do you want to add followups? "Yes" or "No"')
 if add_follow_ups == 'Yes':
