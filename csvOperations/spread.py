@@ -153,7 +153,7 @@ if add_follow_ups == 'Yes':
        #datetime.today() - timedelta(days = 4)
        count = 0
        for key in rhino_dict:
-              if datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') > date_start and datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') <= date_end:
+              if datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') >= date_start and datetime.strptime(rhino_dict[key]['encounter_date'], '%d/%m/%Y') <= date_end:
                      #print(rhino_dict[key]['encounter_date'])
                      rhino_follow_up_dict[count] = rhino_dict[key]
                      count += 1

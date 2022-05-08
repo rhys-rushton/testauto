@@ -53,7 +53,7 @@ def add_follow_up(driver, patient_object):
         #Save the follow up encounter. 
         save_button = driver.find_element_by_class_name('btn.btn-dark')
         save_button.click()
-        number += 1
+        
         follow_up_done.append(patient_object)
         print('Follow up added')
 
@@ -159,6 +159,7 @@ def main ():
 
 main()
 print('Follow ups done.')
+print(number)
 
 #fields for the csv
 fields = ['name', 'surname', 'DOB', 'encounter_id', 'encounter_date', 'outcome']
